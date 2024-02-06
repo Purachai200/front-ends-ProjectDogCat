@@ -2,13 +2,13 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
-import { MockUpContextProvider } from './contexts/MockUpContext.jsx'
+import { AuthContextProvider } from './contexts/AuthContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   // MockupContext Use for MockUp UI
   <React.StrictMode>
-    <MockUpContextProvider> 
+    <AuthContextProvider> 
     <App />
-    </MockUpContextProvider>
+    </AuthContextProvider>
   </React.StrictMode>,
 )

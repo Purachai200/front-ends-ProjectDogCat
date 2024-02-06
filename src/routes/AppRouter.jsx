@@ -1,4 +1,6 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
+
 
 import NotFound from '../layouts/Guest/NotFound'
 import MainLayout from '../layouts/Header_Outlet/MainLayout'
@@ -12,7 +14,6 @@ import Admin_Register from '../layouts/Guest/Admin_Register'
 import Recorder_Main from '../layouts/Pages/Recorder/Recorder_Main'
 import Admin_Main from '../layouts/Pages/Admin/Admin_Main'
 
-import useMock from '../hooks/useMockUp';
 import AdminLayout from '../layouts/Header_Outlet/AdminLayout';
 import RecorderLayout from '../layouts/Header_Outlet/RecorderLayout'
 
@@ -64,36 +65,20 @@ const recorderRouter = createBrowserRouter([
   }
 ])
 
-// Comment for MockUp
-// const RecorderRouter = createBrowserRouter([
-//   {
-//     path: '/recorder',
-//     element: <MainLayout/>,
-//     children: [
-//       { index: true, element: <Recorder_Main/> },
-//       { path: '*', element: <NotFound /> }
-//     ]
-//   }
-// ]);
-
-// const AdminRouter = createBrowserRouter([
-//   {
-//     path: '/admin',
-//     element: <MainLayout/>,
-//     children: [
-//       { index: true, element: <Admin_Main/> },
-//       { path: '*', element: <NotFound /> }
-//     ]
-//   }
-// ]);
-
 export default function AppRouter() {
 
-  // use for mockup
-  const { isAdmin, isRecorder } = useMock()
-  console.log(isAdmin, isRecorder)
-
-  const router = isAdmin ? adminRouter : (isRecorder ? recorderRouter : guestRouter);
+  const { user } = useAuth()
+  let router;
+  if (!user){
+    router = guestRouter;
+  }
+  else if (user.role === "ADMIN") {
+    router = adminRouter;
+  } else if (user.role === "RECORDER") {
+    router = recorderRouter;
+  } else {
+    router = guestRouter;
+  }
   return (
     <RouterProvider router = {router} />
   )

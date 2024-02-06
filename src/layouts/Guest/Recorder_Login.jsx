@@ -1,14 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
-import useMockUp from "../../hooks/useMockUp"
 
 export default function Recorder_Login() {
   const navigate = useNavigate()
-  const { hdlRecLogin } = useMockUp()
 
   const hdlLogin = async () => {
     try {
+      
       navigate("/")
-      await hdlRecLogin()
     } catch (err) {
       console.log(err.message)
     }

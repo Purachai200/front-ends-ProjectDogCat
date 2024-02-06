@@ -1,70 +1,70 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useMockUp from "../../hooks/useMockUp"
+import useAuth from "../../hooks/useAuth";
+import axios from "axios";
 
 export default function Admin_Login() {
-
+  const [input, setInput] = useState({
+    username: '',
+    password: '',
+  })
+  const { baseUrl, setUser, alertSW } = useAuth()
   const navigate = useNavigate();
 
-  // for MockUp
-  const {hdlAdminLogin} = useMockUp()
-  const login = async () => {
+  const hdlChange = e => {
+    setInput( prv => ( { ...prv, [e.target.name] : e.target.value } ) )
+  }
+
+  const hldLogin = async (e) => {
+    e.preventDefault()
     try {
+      if(input.username === ""){
+        alertSW("มีบางอย่างผิดพลาด","กรุณากรอกชื่อผู้ใช้", "error")
+        return;
+      }
+      if(input.password === ""){
+        alertSW("มีบางอย่างผิดพลาด","กรุณากรอกรหัสผ่าน", "error")
+        return;
+      }
+      const rs = await axios.post(`${baseUrl}/auth/login/admin`, input)
+      console.log(rs.data.token)
+      localStorage.setItem('DogAndCattoken', rs.data.token)
+      const rsAuth = await axios.get(`${baseUrl}/auth/get-admin`, {
+        headers : { Authorization : `Bearer ${rs.data.token}`}
+      })
+      setUser(rsAuth.data)
       navigate("/")
-      await hdlAdminLogin()
     } catch (err) {
-      console.log(err.message)
+      console.log(err)
+      if(err.response.data.message === "Username or Password is invalid.") {
+        alert("ชื่อผู้ใช้ หรือ รหัสผ่าน ไม่ถูกต้อง")
+      }
     }
   }
 
   return (
     <div>
       <div className="min-h-0 flex justify-between items-center">
-        <div className="container">
-          <div className="h-screen p-0 flex flex-col justify-center items-center">
-            <div className="h-3/4 m-1 carousel carousel-vertical rounded-box">
-              <div className="carousel-item h-full w-full">
-                <img src="https://daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.jpg" />
-              </div>
-              <div className="carousel-item h-full w-full">
-                <img src="https://daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.jpg" />
-              </div>
-              <div className="carousel-item h-full w-full">
-                <img src="https://daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.jpg" />
-              </div>
-              <div className="carousel-item h-full w-full">
-                <img src="https://daisyui.com/images/stock/photo-1494253109108-2e30c049369b.jpg" />
-              </div>
-              <div className="carousel-item h-full w-full">
-                <img src="https://daisyui.com/images/stock/photo-1550258987-190a2d41a8ba.jpg" />
-              </div>
-              <div className="carousel-item h-full w-full">
-                <img src="https://daisyui.com/images/stock/photo-1559181567-c3190ca9959b.jpg" />
-              </div>
-              <div className="carousel-item h-full w-full">
-                <img src="https://daisyui.com/images/stock/photo-1601004890684-d8cbf643f5f2.jpg" />
-              </div>
-            </div>
-          </div>
-          <div className="-mt-20 mx-5">
-            <Link to={"/"} className="btn btn-outline btn-accent">
-              ย้อนกลับ
-            </Link>
-          </div>
-        </div>
         <div className="container min-h-screen flex flex-col justify-center items-center">
             <div className="text-center">  
             <div className="text-4xl">เข้าสู่ระบบผู้ดูแลระบบ</div>
             <div className="text-xl mt-2">Admin Login</div>
             </div>
-            <form className="mt-5 items-center w-full flex flex-col" onSubmit={login}>
+            <form className="mt-5 items-center w-full flex flex-col" onSubmit={hldLogin}>
               <input
                 type="username"
                 placeholder="ชื่อผู้ใช้"
+                name="username"
+                value={input.username}
+                onChange={hdlChange}
                 className="input input-bordered w-full max-w-md mt-5"
               />
               <input
                 type="password"
                 placeholder="รหัสผ่าน"
+                name="password"
+                value={input.password}
+                onChange={hdlChange}
                 className="input input-bordered w-full max-w-md mt-8"
               />
               <button
@@ -78,7 +78,13 @@ export default function Admin_Login() {
             <Link to={'/admin-register'} className="underline text-center text-neutral hover:text-success transition-all">ลงทะเบียนผู้ดูแล</Link>
             </div>
           </div>
+          
       </div>
+      <div className="-mt-20 mx-5">
+            <Link to={"/"} className="btn btn-outline btn-accent">
+              ย้อนกลับ
+            </Link>
+          </div>
     </div>
   )
 }
