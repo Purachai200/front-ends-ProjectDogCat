@@ -5,7 +5,6 @@ import './index.css'
 import { AuthContextProvider } from './contexts/AuthContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  // MockupContext Use for MockUp UI
   <React.StrictMode>
     <AuthContextProvider> 
     <App />

@@ -69,16 +69,16 @@ export default function AppRouter() {
 
   const { user } = useAuth()
   let router;
-  if (!user){
+  if (!user) {
     router = guestRouter;
-  }
-  else if (user.role === "ADMIN") {
-    router = adminRouter;
   } else if (user.role === "RECORDER") {
     router = recorderRouter;
+  } else if (user.role === "ADMIN") {
+    router = adminRouter;
   } else {
     router = guestRouter;
   }
+  
   return (
     <RouterProvider router = {router} />
   )

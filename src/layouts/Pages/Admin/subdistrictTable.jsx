@@ -16,7 +16,7 @@ export default function SubdistrictTable() {
     zipcode: "",
   });
 
-  const { baseUrl, alertSW } = useAuth();
+  const { baseUrl, alertSW, alertQuestion } = useAuth();
 
   useEffect(() => {
     fetchData();
@@ -157,15 +157,14 @@ export default function SubdistrictTable() {
       if (!token) {
         return;
       }
-      await axios.delete( `${baseUrl}/admin/delete-subdistrict/${id}`,
-      {
+      await axios.delete(`${baseUrl}/admin/delete-subdistrict/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      fetchData()
+      });
+      fetchData();
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-  }
+  };
 
   return (
     <div>
@@ -354,9 +353,20 @@ export default function SubdistrictTable() {
                     >
                       แก้ไข
                     </button>
-                    <button className="btn btn-ghost btn-xs" onClick={async () => {
-                      await hdlDelete(row.id)
-                    }}>ลบ</button>
+                    <button
+                      className="btn btn-ghost btn-xs"
+                      onClick={() =>
+                        alertQuestion(
+                          "ต้องการลบไฟล์หรือไม่",
+                          "ต้องการลบองค์กรนี้ใช่หรือไม่ ?",
+                          async () => {
+                            await hdlDelete(row.id);
+                          }
+                        )
+                      }
+                    >
+                      ลบ
+                    </button>
                   </div>
                 </td>
               </tr>

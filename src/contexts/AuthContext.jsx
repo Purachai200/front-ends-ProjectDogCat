@@ -13,37 +13,42 @@ function AuthContextProvider(props) {
   const baseUrl = "http://localhost:8000";
 
   useEffect(() => {
-    const run = async () => {
+    const fetchData = async () => {
       try {
-        setLoading(true);
         let token = localStorage.getItem("DogAndCattoken");
         if (!token) {
           return;
         }
-        const adminResponse = await axios.get(`${baseUrl}/auth/get-admin`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        let userResponse = adminResponse.data;
-        if (!userResponse) {
+        setLoading(true);
+        try {
+          const adminResponse = await axios.get(`${baseUrl}/auth/get-admin`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          let userResponse = adminResponse.data;
+          setUser(userResponse);
+        } catch (err) {
+          console.error(err.message);
+        }
+        try {
           const recorderResponse = await axios.get(`${baseUrl}/auth/get-recorder`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          userResponse = recorderResponse.data;
+          let userResponse = recorderResponse.data;
+          setUser(userResponse);
+        } catch (err) {
+          console.error(err.message);
         }
-        if(!userResponse) {
-          userResponse = null
-        }
-        setUser(userResponse);
       } catch (err) {
-        console.error(err.message);
+        console.log(err.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     };
-
-    run();
+  
+    fetchData();
   }, []);
+  
+  
 
 const logout = () => {
   setUser(null);
@@ -51,15 +56,40 @@ const logout = () => {
 }
 
 const swalLoading = () => {
-  Swal({
-    title: 'กำลังโหลด',
-    allowEscapeKey: false,
+  Swal.fire({
+    title: 'กำลังโหลด...',
     allowOutsideClick: false,
-    loading: () => {
+    willOpen: () => {
       Swal.showLoading();
-    }
-  })
+    },
+    timer: 1000,
+    showConfirmButton: false
+  });
+  return null;
 }
+
+const alertQuestion = (title, text, func) => {
+  Swal.fire({
+    title: title,
+    text: text,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "ตกลง",
+    cancelButtonText: "ตกลง"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: "ลบสำเร็จ",
+        text: "ลบสิ่งที่คุณเลือกเสร็จสิ้น",
+        icon: "success"
+      }).then(() => {
+        func();
+      });
+    }
+  });
+};
 
 const alertSW = (title,text,icon) => {
   Swal.fire({
@@ -71,7 +101,7 @@ const alertSW = (title,text,icon) => {
 }
 
 return (
-  <AuthContext.Provider value={{ user, setUser, loading, logout, baseUrl, swalLoading, alertSW }}>
+  <AuthContext.Provider value={{ user, setUser, loading, logout, baseUrl, swalLoading, alertSW, alertQuestion }}>
     {props.children}
   </AuthContext.Provider>
   )

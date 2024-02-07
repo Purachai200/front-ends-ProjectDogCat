@@ -27,7 +27,6 @@ export default function Admin_Login() {
         return;
       }
       const rs = await axios.post(`${baseUrl}/auth/login/admin`, input)
-      console.log(rs.data.token)
       localStorage.setItem('DogAndCattoken', rs.data.token)
       const rsAuth = await axios.get(`${baseUrl}/auth/get-admin`, {
         headers : { Authorization : `Bearer ${rs.data.token}`}
@@ -37,14 +36,14 @@ export default function Admin_Login() {
     } catch (err) {
       console.log(err)
       if(err.response.data.message === "Username or Password is invalid.") {
-        alert("ชื่อผู้ใช้ หรือ รหัสผ่าน ไม่ถูกต้อง")
+        alertSW("มีบางอย่างผิดพลาด","ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", "error")
       }
     }
   }
 
   return (
     <div>
-      <div className="min-h-0 flex justify-between items-center">
+      <div className="min-h-0 flex justify-center items-center">
         <div className="container min-h-screen flex flex-col justify-center items-center">
             <div className="text-center">  
             <div className="text-4xl">เข้าสู่ระบบผู้ดูแลระบบ</div>

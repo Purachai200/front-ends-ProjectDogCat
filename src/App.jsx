@@ -2,11 +2,11 @@ import useAuth from "./hooks/useAuth";
 import AppRouter from "./routes/AppRouter";
 
 function App() {
-  const {loading, SwalLoading} = useAuth()
+  const {loading, swalLoading} = useAuth()
 
   if(loading) {
     return (
-      SwalLoading
+      swalLoading()
     )
   }
 

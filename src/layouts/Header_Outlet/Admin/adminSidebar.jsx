@@ -7,8 +7,8 @@ export default function adminSidebar() {
 
   const {logout, user} = useAuth()
   const Logout = async () => {
+    navigate("/")
     await logout()
-    navigate('/')
   }
   
   return (

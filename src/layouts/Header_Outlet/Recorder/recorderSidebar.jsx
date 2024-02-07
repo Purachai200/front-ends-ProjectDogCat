@@ -1,15 +1,14 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useMockUp from "../../../hooks/useMockUp"
+import useAuth from "../../../hooks/useAuth";
 
 export default function recorderSidebar() {
   const navigate = useNavigate()
 
-  // for MockUp
-  const {setIsAdmin, setIsRecorder, hdlLogOut} = useMockUp()
+  const {logout, user} = useAuth()
   const Logout = async () => {
-    navigate('/')
-    await hdlLogOut()
+    navigate("/")
+    await logout()
   }
   
   return (
@@ -22,9 +21,9 @@ export default function recorderSidebar() {
             </div>
           </div>
           <div className="p-2">
-            <div className="text-xl">Role User</div>
-            <div className="">Role User</div>
-            <div className="">Name User</div>
+            <div className="text-xl">ผู้บันทึกระบบ</div>
+            <div className="">{user.username}</div>
+            <div className="">{user.first_name}  {user.last_name}</div>
           </div>
         </div>
         <li className="mt-5 text-l">
