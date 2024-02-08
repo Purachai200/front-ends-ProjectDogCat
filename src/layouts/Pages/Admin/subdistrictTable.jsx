@@ -138,7 +138,7 @@ export default function SubdistrictTable() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      alertSW("เสร็จสิ้น", "เพิ่มองค์กรเสร็จสิ้น", "success");
+      alertSW("เสร็จสิ้น", "แก้ไขข้อมูลองค์กรเสร็จสิ้น", "success");
       fetchData();
     } catch (err) {
       console.log(err);

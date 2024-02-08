@@ -35,7 +35,7 @@ export default function Admin_Login() {
       navigate("/")
     } catch (err) {
       console.log(err)
-      if(err.response.data.message === "Username or Password is invalid.") {
+      if(err.response.data.message === "Email or Password is invalid.") {
         alertSW("มีบางอย่างผิดพลาด","ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", "error")
       }
     }

@@ -77,7 +77,7 @@ const alertQuestion = (title, text, func) => {
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",
     confirmButtonText: "ตกลง",
-    cancelButtonText: "ตกลง"
+    cancelButtonText: "ยกเลิก"
   }).then((result) => {
     if (result.isConfirmed) {
       Swal.fire({

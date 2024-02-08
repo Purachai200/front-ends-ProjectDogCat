@@ -1,16 +1,117 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PetsTable from "./PetsTable";
+import useAuth from "../../../../hooks/useAuth";
+import axios from "axios";
 
 export default function Register_Table() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editData, setEditData] = useState([]);
+  const [data, setData] = useState([]);
 
-  const handleSubmit = (e) => {
+  const [location, setLocation] = useState([]);
+
+  const [input, setInput] = useState({
+    address_moo: "",
+    dog_amount: "",
+    cat_amount: "",
+    name_info: "",
+    vaccined: "",
+    sterilized: "",
+    location_id: "",
+  });
+
+  const { baseUrl, alertSW, alertQuestion, user } = useAuth();
+
+  useEffect(() => {
+    fetchData();
+    fetchLocation();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+
+      const result = await axios.get(
+        `${baseUrl}/recorder/getByData/table/unregistered/from/subdistrictId/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setData(result.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchLocation = async () => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+
+      const result = await axios.get(`${baseUrl}/recorder/get/location`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setLocation(result.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Create
+  const handleChange = (e) => {
+    setInput((prevInput) => ({
+      ...prevInput,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted");
-    // Close the modal
-    setIsAddOpen(false);
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      if (
+        input.address_moo === "" ||
+        input.dog_amount === "" ||
+        input.cat_amount === "" ||
+        input.name_info === "" ||
+        input.sterilized === "" ||
+        input.vaccined === "" ||
+        input.location_id === ""
+      ) {
+        alertSW("มีบางอย่างผิดพลาด", "กรุณากรอกข้อมูลให้ครบถ้วน", "error");
+        return;
+      }
+      await axios.post(
+        `${baseUrl}/recorder/create-unregister/${user.subdistrictId}`,
+        input,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alertSW("เสร็จสิ้น", "แก้ไขข้อมูลผู้บันทึกเสร็จสิ้น", "success");
+      setInput({
+        address_moo: "",
+        dog_amount: "",
+        cat_amount: "",
+        name_info: "",
+        vaccined: "",
+        sterilized: "",
+        location_id: "",
+      });
+      fetchData();
+      setIsAddOpen(false);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleClose = () => {
@@ -18,17 +119,94 @@ export default function Register_Table() {
     setIsAddOpen(false);
   };
 
-  const handleEditSubmit = (e) => {
+  // Update
+
+  const hdlEditChange = (e) => {
+    setEditData((prevInput) => ({
+      ...prevInput,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const fetchEditData = async (id) => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+
+      const result = await axios.get(
+        `${baseUrl}/recorder/get/table/unregistered/from/id/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setEditData(result.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted");
-    // Close the modal
-    setIsEditOpen(false);
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      if (
+        editData.address_moo === "" ||
+        editData.dog_amount === "" ||
+        editData.cat_amount === "" ||
+        editData.name_info === "" ||
+        editData.sterilized === "" ||
+        editData.vaccined === ""
+      ) {
+        alertSW("มีบางอย่างผิดพลาด", "กรุณากรอกข้อมูลให้ครบถ้วน", "error");
+        return;
+      }
+      const { id, locationId, subdistrictId, ...postData } = editData;
+      await axios.patch(
+        `${baseUrl}/recorder/update-unregistered/${editData.id}`,
+        postData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alertSW("เสร็จสิ้น", "แก้ไขข้อมูลผู้บันทึกเสร็จสิ้น", "success");
+      setInput({
+        address_moo: "",
+        dog_amount: "",
+        cat_amount: "",
+        name_info: "",
+        vaccined: "",
+        sterilized: "",
+      });
+      fetchData();
+      setIsEditOpen(false);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleEditClose = () => {
-    // Close the modal
     setIsEditOpen(false);
+  };
+
+  // Delete
+  const hdlDelete = async (id) => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      await axios.delete(`${baseUrl}/recorder/delete-unregistered/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchData();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -51,16 +229,13 @@ export default function Register_Table() {
               </a>
             </div>
             <form onSubmit={handleSubmit}>
-              <label htmlFor=""></label>
               <div className="flex gap-4 mt-6">
                 <input
                   type="text"
                   placeholder="หมู่ที่"
-                  className="input input-bordered w-full max-w-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="ตำบล"
+                  name="address_moo"
+                  value={input.address_moo}
+                  onChange={handleChange}
                   className="input input-bordered w-full max-w-xs"
                 />
               </div>
@@ -68,37 +243,57 @@ export default function Register_Table() {
                 <input
                   type="text"
                   placeholder="ชื่อผู้ให้ข้อมูล"
+                  name="name_info"
+                  value={input.name_info}
+                  onChange={handleChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="สุนัขจำนวน"
+                  name="dog_amount"
+                  value={input.dog_amount}
+                  onChange={handleChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="แมวจำนวน"
+                  name="cat_amount"
+                  value={input.cat_amount}
+                  onChange={handleChange}
                   className="input input-bordered w-full max-w-xs"
                 />
-                <input
-                  type="text"
-                  placeholder="ประวัติการฉีดวัคซีน"
-                  className="input input-bordered w-full max-w-xs"
-                />
+                <select name="sterilized" onChange={handleChange}>
+                  <option value="" disabled>
+                    กรุณาเลือกประวัติการทำหมัน
+                  </option>
+                  <option value="NOT_STERILIZED">ไม่เคยทำหมัน</option>
+                  <option value="STERILIZED">เคยทำหมัน</option>
+                </select>
               </div>
               <div className="flex mt-4 gap-4">
-                <input
-                  type="text"
-                  placeholder="วัคซีนครั้ล่าสุดประมาณ"
-                  className="input input-bordered w-full max-w-xs"
-                />
-                <select>
-                  <option value="someOption">เคยทำหมัน</option>
-                  <option value="otherOption">ไม่เคยทำหมัน</option>
+                <select
+                  name="vaccined"
+                  value={input.vaccined}
+                  onChange={handleChange}
+                >
+                  <option value="" disabled>
+                    กรุณาเลือกประวัติการฉีดวัคซีน
+                  </option>
+                  <option value="NOT_VACCINED">ไม่เคยฉีดวัคซีน</option>
+                  <option value="VACCINED">เคยฉีดวัคซีน</option>
                 </select>
-                <select>
-                  <option value="someOption">วัด</option>
-                  <option value="otherOption">อนามัย</option>
+                <select
+                  name="location_id"
+                  value={input.location_id}
+                  onChange={handleChange}
+                >
+                  {location.map((row, index) => (
+                    <option key={index} value={row.id}>
+                      {row.name_location}
+                    </option>
+                  ))}
                 </select>
                 <button type="submit" className="btn btn-outline btn-success">
                   ส่ง
@@ -127,70 +322,77 @@ export default function Register_Table() {
               </a>
             </div>
             <div className="flex gap-4 mt-6">
-            <form onSubmit={handleSubmit}>
-              <div className="flex gap-4 mt-6">
-                <input
-                  type="text"
-                  placeholder="หมู่ที่"
-                  className="input input-bordered w-full max-w-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="ตำบล"
-                  className="input input-bordered w-full max-w-xs"
-                />
-              </div>
-              <div className="flex mt-4 gap-4">
-                <input
-                  type="text"
-                  placeholder="ชื่อผู้ให้ข้อมูล"
-                  className="input input-bordered w-full max-w-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="สุนัขจำนวน"
-                  className="input input-bordered w-full max-w-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="แมวจำนวน"
-                  className="input input-bordered w-full max-w-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="ประวัติการฉีดวัคซีน"
-                  className="input input-bordered w-full max-w-xs"
-                />
-              </div>
-              <div className="flex mt-4 gap-4">
-                <input
-                  type="text"
-                  placeholder="วัคซีนครั้ล่าสุดประมาณ"
-                  className="input input-bordered w-full max-w-xs"
-                />
-                <select>
-                  <option value="someOption">เคยทำหมัน</option>
-                  <option value="otherOption">ไม่เคยทำหมัน</option>
-                </select>
-                <select>
-                  <option value="someOption">วัด</option>
-                  <option value="otherOption">อนามัย</option>
-                </select>
-                <button type="submit" className="btn btn-outline btn-success">
-                  ส่ง
-                </button>
-              </div>
-            </form>
-          </div>
+              <form onSubmit={handleEditSubmit}>
+                <div className="flex gap-4 mt-6">
+                  <input
+                    type="text"
+                    placeholder="หมู่ที่"
+                    name="address_moo"
+                    value={editData.address_moo}
+                    onChange={hdlEditChange}
+                    className="input input-bordered w-full max-w-xs"
+                  />
+                                    <input
+                    type="text"
+                    placeholder="ชื่อผู้ให้ข้อมูล"
+                    name="name_info"
+                    value={editData.name_info}
+                    onChange={hdlEditChange}
+                    className="input input-bordered w-full max-w-xs"
+                  />
+                                    <select
+                    name="vaccined"
+                    value={editData.vaccined}
+                    onChange={hdlEditChange}
+                  >
+                    <option value={""} disabled>
+                      กรุณาเลือกประวัติการฉีดวัคซีน
+                    </option>
+                    <option value="NOT_VACCINED">ไม่เคยฉีดวัคซีน</option>
+                    <option value="VACCINED">เคยฉีดวัคซีน</option>
+                  </select>
+                </div>
+                <div className="flex mt-4 gap-4">
+                  <input
+                    type="text"
+                    placeholder="สุนัขจำนวน"
+                    name="dog_amount"
+                    value={editData.dog_amount}
+                    onChange={hdlEditChange}
+                    className="input input-bordered w-full max-w-xs"
+                  />
+                  <input
+                    type="text"
+                    placeholder="แมวจำนวน"
+                    name="cat_amount"
+                    value={editData.cat_amount}
+                    onChange={hdlEditChange}
+                    className="input input-bordered w-full max-w-xs"
+                  />
+                  <select
+                    name="sterilized"
+                    onChange={hdlEditChange}
+                    value={editData.sterilized}
+                  >
+                    <option value="" disabled>
+                      กรุณาเลือกประวัติการทำหมัน
+                    </option>
+                    <option value="NOT_STERILIZED">ไม่เคยทำหมัน</option>
+                    <option value="STERILIZED">เคยทำหมัน</option>
+                  </select>
+                </div>
+                <div className="flex mt-4 justify-end">
+                  <button type="submit" className="btn btn-outline btn-success">
+                    ส่ง
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </dialog>
       )}
 
-      <div className="flex justify-between items-center p-2">
-      <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
-          <option value="moo1">หมู่ 1</option>
-          <option value="moo2">หมู่ 2</option>
-        </select>
+      <div className="flex justify-end items-center p-2">
         <a
           className="btn btn-outline btn-success"
           onClick={() => setIsAddOpen(true)}
@@ -198,104 +400,81 @@ export default function Register_Table() {
           เพิ่ม
         </a>
       </div>
-      <div className="overflow-x-auto overflow-y-scroll max-h-96 w-full p-2">
-        <table className="table">
+      <div className="overflow-x-auto overflow-y-scroll max-h-[600px] w-full p-2">
+        <table className="table text-center">
           {/* head */}
           <thead>
             <tr>
-              <th>บ้าน</th>
-              <th>จำนวนหมา</th>
+              <th>หมู่ที่</th>
+              <th>สถานที่อยู่อาศัย</th>
+              <th>ชื่อสถานที่อยู่อาศัย</th>
+              <th>จำนวนสุนัข</th>
               <th>จำนวนแมว</th>
-              <th></th>
+              <th>ชื่อผู้ให้ข้อมูล</th>
+              <th>ประวัติการฉีดวัคซีน</th>
+              <th>ประวัติการทำหมัน</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {/* row 1 */}
-            <tr>
-              <th>บ้านห้วยมะทอ</th>
-              <td>14</td>
-              <td>13</td>
-              <td className="max-w-4">
-                <div className="flex justify- gap-4 ">
-                  <a
-                    className="btn btn-circle btn-outline btn-warning"
-                    onClick={() => setIsEditOpen(true)}
-                  >
-                    แก้ไข
-                  </a>
-                  <a className="btn btn-circle btn-outline btn-error">ลบ</a>
-                </div>
-              </td>
-            </tr>
-            {/* row 1 */}
-            <tr>
-              <th>บ้านห้วยมะทอ</th>
-              <td>14</td>
-              <td>13</td>
-              <td className="max-w-4">
-                <div className="flex justify- gap-4 ">
-                  <a
-                    className="btn btn-circle btn-outline btn-warning"
-                    onClick={() => setIsEditOpen(true)}
-                  >
-                    แก้ไข
-                  </a>
-                  <a className="btn btn-circle btn-outline btn-error">ลบ</a>
-                </div>
-              </td>
-            </tr>
-            {/* row 1 */}
-            <tr>
-              <th>บ้านห้วยมะทอ</th>
-              <td>14</td>
-              <td>13</td>
-              <td className="max-w-4">
-                <div className="flex justify- gap-4 ">
-                  <a
-                    className="btn btn-circle btn-outline btn-warning"
-                    onClick={() => setIsEditOpen(true)}
-                  >
-                    แก้ไข
-                  </a>
-                  <a className="btn btn-circle btn-outline btn-error">ลบ</a>
-                </div>
-              </td>
-            </tr>
-            {/* row 1 */}
-            <tr>
-              <th>บ้านห้วยมะทอ</th>
-              <td>14</td>
-              <td>13</td>
-              <td className="max-w-4">
-                <div className="flex justify- gap-4 ">
-                  <a
-                    className="btn btn-circle btn-outline btn-warning"
-                    onClick={() => setIsEditOpen(true)}
-                  >
-                    แก้ไข
-                  </a>
-                  <a className="btn btn-circle btn-outline btn-error">ลบ</a>
-                </div>
-              </td>
-            </tr>
-            {/* row 1 */}
-            <tr>
-              <th>บ้านห้วยมะทอ</th>
-              <td>14</td>
-              <td>13</td>
-              <td className="max-w-4">
-                <div className="flex justify- gap-4 ">
-                  <a
-                    className="btn btn-circle btn-outline btn-warning"
-                    onClick={() => setIsEditOpen(true)}
-                  >
-                    แก้ไข
-                  </a>
-                  <a className="btn btn-circle btn-outline btn-error">ลบ</a>
-                </div>
-              </td>
-            </tr>
+            {/* Map Data Unregister */}
+            {data.map((row, index) => (
+              <tr key={index}>
+                <th>{row.address_moo}</th>
+                <td>
+                  {
+                    location.find((location) => location.id === row.locationId)
+                      ?.location
+                  }
+                </td>
+                <td>
+                  {
+                    location.find((location) => location.id === row.locationId)
+                      ?.name_location
+                  }
+                </td>
+                <td>{row.dog_amount}</td>
+                <td>{row.cat_amount}</td>
+                <td>{row.name_info}</td>
+                <td>
+                  {row.vaccined === "VACCINED"
+                    ? "ได้รับวัคซีน"
+                    : "ยังไม่ได้รับวัคซีน"}
+                </td>
+                <td>
+                  {row.sterilized === "STERILIZED"
+                    ? "ทำหมันแล้ว"
+                    : "ยังไม่ได้ทำหมัน"}
+                </td>
+                <td className="max-w-4">
+                  <div className="flex justify- gap-2 ">
+                    <a
+                      className="btn btn-circle btn-outline btn-warning"
+                      onClick={async () => {
+                        await fetchEditData(row.id);
+                        setIsEditOpen(true);
+                      }}
+                    >
+                      แก้ไข
+                    </a>
+                    <a
+                      className="btn btn-circle btn-outline btn-error"
+                      onClick={() =>
+                        alertQuestion(
+                          "ต้องการลบไฟล์หรือไม่",
+                          "ต้องการลบผู้บันทึกนี้ใช่หรือไม่ ?",
+                          async () => {
+                            await hdlDelete(row.id);
+                          }
+                        )
+                      }
+                    >
+                      ลบ
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
