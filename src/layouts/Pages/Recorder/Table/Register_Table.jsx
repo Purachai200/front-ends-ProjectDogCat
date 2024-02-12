@@ -1,5 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PetsTable from "./PetsTable";
+import useAuth from "../../../../hooks/useAuth";
+import {
+  fetchAddress,
+  fetchLocation,
+  fetchNature,
+} from "../../../../services/recorder/recorder_fetch";
+import axios from "axios";
 
 export default function Register_Table() {
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -7,24 +14,180 @@ export default function Register_Table() {
   const [isPetAddOpen, setIsPetAddOpen] = useState(false);
   const [isOwnerEdit, setIsOwnerEdit] = useState(false);
 
-  const handleSubmit = (e) => {
+  const [location, setLocation] = useState([]);
+  const [nature, setNature] = useState([]);
+  const [address, setAddress] = useState([]);
+
+  const [addressData, setAddressData] = useState([]);
+  const [petOwner, setPetOwner] = useState([]);
+
+  const [address_input, setAddress_input] = useState({
+    house_name: "",
+    house_number: "",
+    moo: "",
+    soi: "",
+    street: "",
+  });
+
+  const [petOwner_input, setPetOwner_input] = useState({
+    first_name: "",
+    last_name: "",
+    identity_number: "",
+    tel: "",
+  });
+
+  const { baseUrl, alertSW, alertQuestion, user } = useAuth();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      const addressData = await fetchAddress(baseUrl, token);
+      setAddress(addressData);
+
+      const locationData = await fetchLocation(baseUrl, token);
+      setLocation(locationData);
+
+      const natureData = await fetchNature(baseUrl, token);
+      setNature(natureData);
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchEditPetOwner = async (addressId) => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      const result1 = await axios.get(
+        `${baseUrl}/recorder/get/table/pet_owner/from/addressId/${addressId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const result2 = await axios.get(
+        `${baseUrl}/recorder/get/table/address/from/id/${addressId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      return setPetOwner(result1.data), setAddressData(result2.data);
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  };
+
+  // Create
+  const handleAddressChange = (e) => {
+    setAddress_input((prevInput) => ({
+      ...prevInput,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handlePetOwnerChange = (e) => {
+    setPetOwner_input((prevInput) => ({
+      ...prevInput,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted");
-    // Close the modal
-    setIsAddOpen(false);
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      if (
+        address_input.house_name === "" ||
+        address_input.house_number === "" ||
+        address_input.moo === "" ||
+        address_input.soi === "" ||
+        address_input.street === "" ||
+        petOwner_input.first_name === "" ||
+        petOwner_input.last_name === "" ||
+        petOwner_input.identity_number === "" ||
+        petOwner_input.tel === ""
+      ) {
+        alertSW("มีบางอย่างผิดพลาด", "กรุณากรอกข้อมูลให้ครบถ้วน", "error");
+        return;
+      }
+      const addressResponse = await axios.post(
+        `${baseUrl}/recorder/create-address/`,
+        address_input,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log(addressResponse);
+      const addressId = addressResponse.data.id;
+
+      if (!addressId) {
+        alertSW("มีบางอย่างผิดพลาด", "ไม่สามารถสร้างที่อยู่ได้", "error");
+        return;
+      }
+
+      await axios.post(
+        `${baseUrl}/recorder/create-pet-owner/${addressId}`,
+        petOwner_input,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      alertSW("เสร็จสิ้น", "แก้ไขข้อมูลผู้บันทึกเสร็จสิ้น", "success");
+      setAddress_input({
+        house_name: "",
+        house_number: "",
+        moo: "",
+        soi: "",
+        street: "",
+      });
+      setPetOwner_input({
+        first_name: "",
+        last_name: "",
+        identity_number: "",
+        tel: "",
+      });
+      fetchData();
+      setIsAddOpen(false);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleClose = () => {
-    // Close the modal
     setIsAddOpen(false);
   };
 
-  const handleEditSubmit = (e) => {
+  // Update Address And Pet Owner
+
+  const hdlEditChange = (e) => {
+    setAddressData((prevInput) => ({
+      ...prevInput,
+      [e.target.name]: e.target.value,
+    }));
+
+    setPetOwner((prevInput) => ({
+      ...prevInput,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted");
-    // Close the modal
     setIsEditOpen(false);
   };
 
@@ -42,21 +205,86 @@ export default function Register_Table() {
   };
 
   const handlePetClose = () => {
-    // Close the modal
     setIsPetAddOpen(false);
   };
 
-  const handleOwnerEdit = (e) => {
+  const handleOwnerEdit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted");
-    // Close the modal
-    setIsOwnerEdit(false);
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      if (!addressData || !petOwner) {
+        alertSW("มีบางอย่างผิดพลาด", "กรุณากรอกข้อมูลให้ครบถ้วน", "error");
+        return;
+      }
+
+      // Address 
+      const {
+        id: address_Id,
+        subdistrictId,
+        recorderId,
+        first_name,
+        last_name,
+        identity_number,
+        tel,
+        ...addressDa
+      } = addressData;
+
+      // Pet Owner
+      const {
+        id: petOwnerId,
+        addressId,
+        house_number,
+        house_name,
+        moo,
+        soi,
+        street,
+        recorderId: petOwnerRecorderId,
+        ...petOwnerDa
+      } = petOwner;
+
+      await axios.patch(
+        `${baseUrl}/recorder/update-address/${addressData.id}`,
+        addressDa,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      await axios.patch(
+        `${baseUrl}/recorder/update-petOwner/${petOwner.id}`,
+        petOwnerDa,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      fetchEditPetOwner(addressData.id);
+      fetchData();
+      handleOwnerClose()
+      alertSW("เสร็จสิ้น", "แก้ไขข้อมูลผู้บันทึกเสร็จสิ้น", "success");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleOwnerClose = () => {
-    // Close the modal
     setIsOwnerEdit(false);
+  };
+
+  const handlePetOwnerDelete = async (id) => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      await axios.delete(`${baseUrl}/recorder/delete-address/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchData();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -79,16 +307,21 @@ export default function Register_Table() {
               </a>
             </div>
             <form onSubmit={handleSubmit}>
-              <label htmlFor=""></label>
               <div className="flex gap-4 mt-6">
                 <input
                   type="text"
                   placeholder="ชื่อ"
+                  name="first_name"
+                  value={petOwner_input.first_name}
+                  onChange={handlePetOwnerChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="สกุล"
+                  name="last_name"
+                  value={petOwner_input.last_name}
+                  onChange={handlePetOwnerChange}
                   className="input input-bordered w-full max-w-xs"
                 />
               </div>
@@ -96,11 +329,17 @@ export default function Register_Table() {
                 <input
                   type="text"
                   placeholder="เลขบัตรประชาชน"
+                  name="identity_number"
+                  value={petOwner_input.identity_number}
+                  onChange={handlePetOwnerChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="เบอร์โทรศัพท์"
+                  name="tel"
+                  value={petOwner_input.tel}
+                  onChange={handlePetOwnerChange}
                   className="input input-bordered w-full max-w-xs"
                 />
               </div>
@@ -108,11 +347,17 @@ export default function Register_Table() {
                 <input
                   type="text"
                   placeholder="บ้าน"
+                  name="house_name"
+                  value={address_input.house_name}
+                  onChange={handleAddressChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="บ้านเลขที่"
+                  name="house_number"
+                  value={address_input.house_number}
+                  onChange={handleAddressChange}
                   className="input input-bordered w-full max-w-xs"
                 />
               </div>
@@ -120,16 +365,25 @@ export default function Register_Table() {
                 <input
                   type="text"
                   placeholder="หมู่"
+                  name="moo"
+                  value={address_input.moo}
+                  onChange={handleAddressChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="ซอย"
+                  name="soi"
+                  value={address_input.soi}
+                  onChange={handleAddressChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="ถนน"
+                  name="street"
+                  value={address_input.street}
+                  onChange={handleAddressChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <button type="submit" className="btn btn-outline btn-success">
@@ -158,63 +412,79 @@ export default function Register_Table() {
                 X
               </a>
             </div>
-            <label htmlFor=""></label>
             <div className="flex gap-4 mt-6">
               <input
                 type="text"
                 placeholder="ชื่อ"
-                className="input input-bordered w-full max-w-xs "
-                disabled
+                name="first_name"
+                value={petOwner.first_name}
+                className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
+                
               />
               <input
                 type="text"
                 placeholder="สกุล"
-                className="input input-bordered w-full max-w-xs "
-                disabled
+                name="last_name"
+                value={petOwner.last_name}
+                className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
+                
               />
               <input
                 type="text"
                 placeholder="เลขบัตรประชาชน"
-                className="input input-bordered w-full max-w-xs "
-                disabled
+                name="identity_number"
+                value={petOwner.identity_number}
+                className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
+                
               />
               <input
                 type="text"
                 placeholder="เบอร์โทรศัพท์"
-                className="input input-bordered w-full max-w-xs "
-                disabled
+                name="tel"
+                value={petOwner.tel}
+                className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
+                
               />
             </div>
             <div className="flex mt-4 gap-4">
               <input
                 type="text"
                 placeholder="บ้าน"
-                className="input input-bordered w-full max-w-xs "
-                disabled
+                name="house_name"
+                value={addressData.house_name}
+                className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
+                
               />
               <input
                 type="text"
                 placeholder="บ้านเลขที่"
-                className="input input-bordered w-full max-w-xs "
-                disabled
+                name="house_number"
+                value={addressData.house_number}
+                className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
+                
               />
               <input
                 type="text"
                 placeholder="หมู่"
-                className="input input-bordered w-full max-w-xs "
-                disabled
+                name="moo"
+                value={addressData.moo}
+                className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
+                
               />
               <input
                 type="text"
                 placeholder="ซอย"
-                className="input input-bordered w-full max-w-xs "
-                disabled
+                name="soi"
+                value={addressData.soi}
+                className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
+                
               />
               <input
                 type="text"
                 placeholder="ถนน"
-                className="input input-bordered w-full max-w-xs "
-                disabled
+                value={addressData.street}
+                className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
+                
               />
             </div>
             <div className="flex mt-4 gap-4 justify-end p-2">
@@ -235,7 +505,7 @@ export default function Register_Table() {
                 เพิ่มสัตว์เลี้ยง
               </button>
             </div>
-            <PetsTable />
+            <PetsTable owner_id={petOwner.id}/>
             <button
               type="submit"
               className="btn btn-outline btn-success mt-2"
@@ -272,14 +542,14 @@ export default function Register_Table() {
                   placeholder="ชื่อ"
                   className="input input-bordered w-full max-w-xs"
                 />
-                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
-                    <option value="1">หมา</option>
-                    <option value="2">แมว</option>
-                  </select>
-                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
-                    <option value="1">ตัวผู้</option>
-                    <option value="2">ตัวเมีย</option>
-                  </select>
+                <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
+                  <option value="1">หมา</option>
+                  <option value="2">แมว</option>
+                </select>
+                <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
+                  <option value="1">ตัวผู้</option>
+                  <option value="2">ตัวเมีย</option>
+                </select>
               </div>
               <div className="flex mt-4 gap-4">
                 <input
@@ -361,22 +631,30 @@ export default function Register_Table() {
               <div className="text-2xl">แก้ไขที่อยู่</div>
               <a
                 className="btn btn-circle btn-outline btn-error"
-                onClick={handleOwnerClose}
+                onClick={async () => {
+                  await fetchEditPetOwner(addressData.id);
+                  handleOwnerClose(false);
+                }}
               >
                 X
               </a>
             </div>
             <form onSubmit={handleOwnerEdit}>
-              <label htmlFor=""></label>
               <div className="flex gap-4 mt-6">
                 <input
                   type="text"
                   placeholder="ชื่อ"
+                  name="first_name"
+                  value={petOwner.first_name}
+                  onChange={hdlEditChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="สกุล"
+                  name="last_name"
+                  value={petOwner.last_name}
+                  onChange={hdlEditChange}
                   className="input input-bordered w-full max-w-xs"
                 />
               </div>
@@ -384,11 +662,17 @@ export default function Register_Table() {
                 <input
                   type="text"
                   placeholder="เลขบัตรประชาชน"
+                  name="identity_number"
+                  value={petOwner.identity_number}
+                  onChange={hdlEditChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="เบอร์โทรศัพท์"
+                  name="tel"
+                  value={petOwner.tel}
+                  onChange={hdlEditChange}
                   className="input input-bordered w-full max-w-xs"
                 />
               </div>
@@ -396,11 +680,17 @@ export default function Register_Table() {
                 <input
                   type="text"
                   placeholder="บ้าน"
+                  name="house_name"
+                  value={addressData.house_name}
+                  onChange={hdlEditChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="บ้านเลขที่"
+                  name="house_number"
+                  value={addressData.house_number}
+                  onChange={hdlEditChange}
                   className="input input-bordered w-full max-w-xs"
                 />
               </div>
@@ -408,20 +698,29 @@ export default function Register_Table() {
                 <input
                   type="text"
                   placeholder="หมู่"
+                  name="moo"
+                  value={addressData.moo}
+                  onChange={hdlEditChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="ซอย"
+                  name="soi"
+                  value={addressData.soi}
+                  onChange={hdlEditChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <input
                   type="text"
                   placeholder="ถนน"
+                  name="street"
+                  value={addressData.street}
+                  onChange={hdlEditChange}
                   className="input input-bordered w-full max-w-xs"
                 />
                 <button type="submit" className="btn btn-outline btn-success">
-                  ส่ง
+                  แก้ไข
                 </button>
               </div>
             </form>
@@ -453,22 +752,35 @@ export default function Register_Table() {
             </tr>
           </thead>
           <tbody>
-            {/* row 1 */}
-            <tr>
-              <th>148</th>
-              <td>ห้วยมะทอ</td>
-              <td className="max-w-4">
-                <div className="flex justify- gap-4 ">
-                  <a
-                    className="btn btn-circle btn-outline btn-warning"
-                    onClick={() => setIsEditOpen(true)}
-                  >
-                    แก้ไข
-                  </a>
-                  <a className="btn btn-circle btn-outline btn-error">ลบ</a>
-                </div>
-              </td>
-            </tr>
+            {/* Map Data Registered */}
+            {address.map((row, index) => (
+              <tr key={index}>
+                <th>{row.house_number}</th>
+                <td>{row.house_name}</td>
+                <td className="max-w-4">
+                  <div className="flex justify- gap-4 ">
+                    <a
+                      className="btn btn-circle btn-outline btn-warning"
+                      onClick={async () => {
+                        await fetchEditPetOwner(row.id);
+                        setIsEditOpen(true);
+                      }}
+                    >
+                      แก้ไข
+                    </a>
+                    <a className="btn btn-circle btn-outline btn-error" onClick={() =>
+                        alertQuestion(
+                          "ต้องการลบไฟล์หรือไม่",
+                          "ต้องการลบผู้บันทึกนี้ใช่หรือไม่ ?",
+                          async () => {
+                            await handlePetOwnerDelete(row.id);
+                          }
+                        )
+                      }>ลบ</a>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

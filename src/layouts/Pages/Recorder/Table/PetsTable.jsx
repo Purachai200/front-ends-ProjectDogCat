@@ -1,7 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useAuth from "../../../../hooks/useAuth";
+import axios from "axios";
+import { fetchLocation, fetchNature } from "../../../../services/recorder/recorder_fetch";
 
-export default function PetsTable() {
+export default function PetsTable(owner_id) {
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [data, setData] = useState([]);
+  const [location, setLocation] = useState([])
+  const [nature, setNature] = useState([])
+
+  const { baseUrl, alertSW, alertQuestion, user } = useAuth();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+
+      const locationData = await fetchLocation(baseUrl, token);
+      setLocation(locationData);
+
+      const natureData = await fetchNature(baseUrl, token);
+      setNature(natureData);
+
+      const result = await axios.get(
+        `${baseUrl}/recorder/getByData/table/pet/from/pet_owner_id/${owner_id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log(result.data)
+      setData(result.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
@@ -109,7 +147,27 @@ export default function PetsTable() {
             </tr>
           </thead>
           <tbody>
-            {/* row 1 */}
+            {/* Map Pet Data Table */}
+            {data.map((row, index) => (
+              <tr key={index}>
+              <th>{row.name}</th>
+              <td>{row.type}</td>
+              <td>{row.gender}</td>
+              <td>{row.color}</td>
+              <td>{row.defect}</td>
+              <td className="max-w-4">
+                <div className="flex justify- gap-4">
+                  <a
+                    className="btn btn-circle btn-outline btn-warning"
+                    onClick={() => setIsEditOpen(true)}
+                  >
+                    แก้ไข
+                  </a>
+                  <a className="btn btn-circle btn-outline btn-error">ลบ</a>
+                </div>
+              </td>
+            </tr>
+            ))}
             <tr>
               <th>ดำ</th>
               <td>หมา</td>
