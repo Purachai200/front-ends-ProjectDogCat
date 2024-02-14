@@ -36,6 +36,20 @@ export default function Register_Table() {
     tel: "",
   });
 
+  const [pet, setPet] = useState({
+    name: "",
+    type: "",
+    gender: "",
+    color: "",
+    defect: "",
+    age: "",
+    vaccined: "",
+    vaccine_date: "",
+    sterilized: "",
+    location_id: "",
+    nature_id: ""
+  })
+
   const { baseUrl, alertSW, alertQuestion, user } = useAuth();
 
   useEffect(() => {
@@ -80,7 +94,6 @@ export default function Register_Table() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       return setPetOwner(result1.data), setAddressData(result2.data);
     } catch (err) {
       console.error(err);
@@ -192,16 +205,67 @@ export default function Register_Table() {
   };
 
   const handleEditClose = () => {
-    // Close the modal
     setIsEditOpen(false);
   };
 
-  const handlePetSubmit = (e) => {
+  // Create Pet Submit
+
+  const hdlPetChange = (e) => {
+    setPet((prevInput) => ({
+      ...prevInput,
+      [e.target.name]: e.target.value,
+    }))};
+
+  const handlePetSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted");
-    // Close the modal
-    setIsPetAddOpen(false);
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      if (
+        pet.name === "" ||
+        pet.type === "" ||
+        pet.gender === "" ||
+        pet.color === "" ||
+        pet.defect === "" ||
+        pet.age === "" ||
+        pet.vaccined === "" ||
+        pet.vaccine_date === "" ||
+        pet.sterilized === "" ||
+        pet.location_id === "" ||
+        pet.nature_id === ""
+      ) {
+        alertSW("มีบางอย่างผิดพลาด", "กรุณากรอกข้อมูลให้ครบถ้วน", "error");
+        return;
+      }
+      await axios.post(
+        `${baseUrl}/recorder/create-pet/${petOwner.id}`,
+        pet,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alertSW("เสร็จสิ้น", "สร้างข้อมูลสัตวเลี้ยงเสร็จสิ้น", "success");
+      console.log("Pet Submit submitted");
+      setPet({
+        name: "",
+        type: "",
+        gender: "",
+        color: "",
+        defect: "",
+        age: "",
+        vaccined: "",
+        vaccine_date: "",
+        sterilized: "",
+        location_id: "",
+        nature_id: ""
+      })
+      setIsPetAddOpen(false);
+      fetchData()
+    } catch (err) {
+      console.log(err)
+    }
   };
 
   const handlePetClose = () => {
@@ -419,6 +483,7 @@ export default function Register_Table() {
                 name="first_name"
                 value={petOwner.first_name}
                 className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
+                readOnly
                 
               />
               <input
@@ -427,7 +492,7 @@ export default function Register_Table() {
                 name="last_name"
                 value={petOwner.last_name}
                 className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
-                
+                readOnly
               />
               <input
                 type="text"
@@ -435,7 +500,7 @@ export default function Register_Table() {
                 name="identity_number"
                 value={petOwner.identity_number}
                 className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
-                
+                readOnly
               />
               <input
                 type="text"
@@ -443,7 +508,7 @@ export default function Register_Table() {
                 name="tel"
                 value={petOwner.tel}
                 className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
-                
+                readOnly
               />
             </div>
             <div className="flex mt-4 gap-4">
@@ -453,7 +518,7 @@ export default function Register_Table() {
                 name="house_name"
                 value={addressData.house_name}
                 className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
-                
+                readOnly
               />
               <input
                 type="text"
@@ -461,7 +526,7 @@ export default function Register_Table() {
                 name="house_number"
                 value={addressData.house_number}
                 className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
-                
+                readOnly
               />
               <input
                 type="text"
@@ -469,7 +534,7 @@ export default function Register_Table() {
                 name="moo"
                 value={addressData.moo}
                 className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
-                
+                readOnly
               />
               <input
                 type="text"
@@ -477,14 +542,14 @@ export default function Register_Table() {
                 name="soi"
                 value={addressData.soi}
                 className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
-                
+                readOnly
               />
               <input
                 type="text"
                 placeholder="ถนน"
                 value={addressData.street}
                 className="input input-bordered w-full max-w-xs text-black bg-gray-200 pointer-events-none"
-                
+                readOnly
               />
             </div>
             <div className="flex mt-4 gap-4 justify-end p-2">
@@ -535,20 +600,36 @@ export default function Register_Table() {
               </a>
             </div>
             <form onSubmit={handlePetSubmit}>
-              <label htmlFor=""></label>
               <div className="flex gap-4 mt-6">
                 <input
                   type="text"
                   placeholder="ชื่อ"
                   className="input input-bordered w-full max-w-xs"
+                  name="name"
+                  value={pet.name}
+                  onChange={hdlPetChange}
                 />
-                <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
-                  <option value="1">หมา</option>
-                  <option value="2">แมว</option>
+                <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                name="type"
+                value={pet.type}
+                onChange={hdlPetChange}
+                >
+                <option value="" disabled>
+                    กรุณาเลือกประเภท
+                  </option>
+                  <option value="DOG">หมา</option>
+                  <option value="CAT">แมว</option>
                 </select>
-                <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
-                  <option value="1">ตัวผู้</option>
-                  <option value="2">ตัวเมีย</option>
+                <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                name="gender"
+                value={pet.gender}
+                onChange={hdlPetChange}
+                >
+                  <option value="" disabled>
+                    กรุณาเลือกเพศ
+                  </option>
+                  <option value="MALE">ตัวผู้</option>
+                  <option value="FEMALE">ตัวเมีย</option>
                 </select>
               </div>
               <div className="flex mt-4 gap-4">
@@ -556,61 +637,112 @@ export default function Register_Table() {
                   type="text"
                   placeholder="สี"
                   className="input input-bordered w-full max-w-xs"
+                  name="color"
+                  value={pet.color}
+                  onChange={hdlPetChange}
                 />
                 <input
                   type="text"
                   placeholder="ลักษณะเฉพาะ"
                   className="input input-bordered w-full max-w-xs"
+                  name="defect"
+                  value={pet.defect}
+                  onChange={hdlPetChange}
                 />
                 <input
                   type="text"
                   placeholder="อายุ"
                   className="input input-bordered w-full max-w-xs"
+                  name="age"
+                  value={pet.age}
+                  onChange={hdlPetChange}
                 />
               </div>
+            <div className="flex flex-col justify-center p-2">
               {/* Vaccine */}
-              <div className="flex mt-4 gap-4">
                 <div className="flex items-center">
-                  <div className="text-l">ประวัติการฉีดวัคซีน</div>
-                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
-                    <option value="1">เคยฉีด</option>
-                    <option value="2">ไม่เคยฉีด</option>
+                  <div className="text-l">ประวัติการฉีดวัคซีน :</div>
+                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                  name="vaccined"
+                  value={pet.vaccined}
+                  onChange={hdlPetChange}
+                  >
+                  <option value="" disabled>
+                    กรุณาเลือกประวัติการฉีดวัคซีน
+                  </option>
+                    <option value="VACCINED">เคยฉีด</option>
+                    <option value="NOT_VACCINED">ไม่เคยฉีด</option>
                   </select>
                 </div>
                 <div className="flex items-center">
-                  <div className="text-l">ฉีดครั้งล่าสุดประมาณปี</div>
-                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
-                    <option value="1">ปี 2561</option>
-                    <option value="2">ปี 2562</option>
+                  <div className="text-l">ฉีดครั้งล่าสุดประมาณปี :</div>
+                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                  name="vaccine_date"
+                  value={pet.vaccine_date}
+                  onChange={hdlPetChange}
+                  >
+                  <option value="" disabled>
+                    กรุณาเลือกปีที่ฉีดวัคซีน
+                  </option>
+                    <option value="2561">ปี 2561</option>
+                    <option value="2562">ปี 2562</option>
+                    <option value="2563">ปี 2563</option>
+                    <option value="2564">ปี 2564</option>
                   </select>
                 </div>
-              </div>
-              {/* Location */}
-              <div className="flex mt-4 gap-4">
+              {/* Location MAP */}
                 <div className="flex items-center">
                   <div className="text-l">สถานที่ : </div>
-                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
-                    <option value="1">บ้าน</option>
-                    <option value="2">นา</option>
+                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                  name="location_id"
+                  value={pet.location_id}
+                  onChange={hdlPetChange}
+                  >
+                  <option value="" disabled>
+                    กรุณาเลือกสถานที่เลี้ยงดู
+                  </option>
+                  {location.map((row, index) => (
+                    <option key={index} value={row.id}>
+                      {row.name_location}
+                    </option>
+                  ))}
                   </select>
                 </div>
+                {/* Nature MAP */}
                 <div className="flex items-center">
                   <div className="text-l">ลักษณะการเลี้ยง : </div>
-                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
-                    <option value="1">เลี้ยงแบบปล่อย</option>
-                    <option value="2">เลี้ยงแบบปิด</option>
+                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                  name="nature_id"
+                  value={pet.nature_id}
+                  onChange={hdlPetChange}
+                  >
+                  <option value="" disabled>
+                    กรุณาเลือกลักษณะการเลี้ยง
+                  </option>
+                  {nature.map((row, index) => (
+                    <option key={index} value={row.id}>
+                      {row.name_nature}
+                    </option>
+                  ))}
                   </select>
                 </div>
-              </div>
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
                   <div className="text-l">ประวัติการทำหมัน : </div>
-                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300">
-                    <option value="Sterlized">เคยทำหมัน</option>
-                    <option value="UnSterlized">ไม่เคยทำหมัน</option>
+                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                    name="sterilized"
+                    value={pet.sterilized}
+                    onChange={hdlPetChange}
+                    >
+                  <option value="" disabled>
+                    กรุณาเลือกประวัติการทำหมัน
+                  </option>
+                    <option value="STERILIZED">เคยทำหมัน</option>
+                    <option value="NOT_STERILIZED">ไม่เคยทำหมัน</option>
                   </select>
                 </div>
-                <button type="submit" className="btn btn-outline btn-success">
+              </div>
+                <button type="submit" className="btn btn-outline btn-success mt-2">
                   ส่ง
                 </button>
               </div>
@@ -770,8 +902,8 @@ export default function Register_Table() {
                     </a>
                     <a className="btn btn-circle btn-outline btn-error" onClick={() =>
                         alertQuestion(
-                          "ต้องการลบไฟล์หรือไม่",
-                          "ต้องการลบผู้บันทึกนี้ใช่หรือไม่ ?",
+                          "ต้องการลบหรือไม่",
+                          "ต้องการลบบ้านเลขที่นี้ใช่หรือไม่ ?",
                           async () => {
                             await handlePetOwnerDelete(row.id);
                           }

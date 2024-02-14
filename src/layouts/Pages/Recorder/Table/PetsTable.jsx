@@ -27,14 +27,12 @@ export default function PetsTable(owner_id) {
 
       const natureData = await fetchNature(baseUrl, token);
       setNature(natureData);
-
       const result = await axios.get(
-        `${baseUrl}/recorder/getByData/table/pet/from/pet_owner_id/${owner_id}`,
+        `${baseUrl}/recorder/getMatch/table/pet/from/petOwnerId/${owner_id.owner_id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log(result.data)
       setData(result.data);
     } catch (err) {
       console.log(err);
@@ -134,6 +132,11 @@ export default function PetsTable(owner_id) {
       )}
 
       <div className="overflow-x-auto overflow-y-scroll max-h-96 w-full p-2">
+        <div className="flex justify-end">
+        <button className="btn btn-outline btn-success" onClick={()=>{fetchData()}}>
+                  รีเฟรชข้อมูล
+          </button>
+        </div>
         <table className="table">
           {/* head */}
           <thead>
@@ -142,6 +145,7 @@ export default function PetsTable(owner_id) {
               <th>ประเภท</th>
               <th>เพศ</th>
               <th>สี</th>
+              <th>จุดเด่น</th>
               <th>อายุ</th>
               <th></th>
             </tr>
@@ -155,6 +159,7 @@ export default function PetsTable(owner_id) {
               <td>{row.gender}</td>
               <td>{row.color}</td>
               <td>{row.defect}</td>
+              <td>{row.age}</td>
               <td className="max-w-4">
                 <div className="flex justify- gap-4">
                   <a
@@ -168,24 +173,6 @@ export default function PetsTable(owner_id) {
               </td>
             </tr>
             ))}
-            <tr>
-              <th>ดำ</th>
-              <td>หมา</td>
-              <td>ตัวผู้</td>
-              <td>ขาว</td>
-              <td>1.2 ปี</td>
-              <td className="max-w-4">
-                <div className="flex justify- gap-4">
-                  <a
-                    className="btn btn-circle btn-outline btn-warning"
-                    onClick={() => setIsEditOpen(true)}
-                  >
-                    แก้ไข
-                  </a>
-                  <a className="btn btn-circle btn-outline btn-error">ลบ</a>
-                </div>
-              </td>
-            </tr>
           </tbody>
         </table>
       </div>
