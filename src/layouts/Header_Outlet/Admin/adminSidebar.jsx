@@ -51,6 +51,11 @@ export default function adminSidebar() {
             รายชื่อผู้บันทึก
           </Link>
         </li>
+        <li className=" font-bold">
+          <Link to={'/admin-news'}>
+            ข่าวสาร
+          </Link>
+        </li>
       <a className="btn btn-outline btn-error mt-auto" onClick={Logout}>ออกจากระบบ</a>
       </ul>
     </div>

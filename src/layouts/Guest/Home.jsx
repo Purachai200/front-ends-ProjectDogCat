@@ -10,6 +10,7 @@ export default function Home() {
   ChartJS.register(ArcElement, Tooltip);
   const [pet, setPet] = useState([]);
   const [unregister, setUnregister] = useState([]);
+  const [news, setNews] = useState([]);
 
   const { baseUrl } = useAuth();
 
@@ -24,6 +25,16 @@ export default function Home() {
             `${baseUrl}/auth/getPet/pet`
           );
           setPet(result.data);
+        } catch (err) {
+          console.error(err);
+          return [];
+        }
+
+        try {
+          const result = await axios.get(
+            `${baseUrl}/auth/getNews/New_Img`
+          );
+          setNews(result.data);
         } catch (err) {
           console.error(err);
           return [];
@@ -135,27 +146,11 @@ export default function Home() {
       <div className="container">
         <div className="container h-screen p-0 flex justify-center items-center">
           <div className="h-3/4 m-1 carousel carousel-vertical rounded-box">
-            <div className="carousel-item h-full w-full">
-              <img src="https://daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.jpg" />
+            {news.map((row, index) => (
+            <div key={index} className="carousel-item h-full w-full">
+              <img src={row.url} />
             </div>
-            <div className="carousel-item h-full w-full">
-              <img src="https://daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.jpg" />
-            </div>
-            <div className="carousel-item h-full w-full">
-              <img src="https://daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.jpg" />
-            </div>
-            <div className="carousel-item h-full w-full">
-              <img src="https://daisyui.com/images/stock/photo-1494253109108-2e30c049369b.jpg" />
-            </div>
-            <div className="carousel-item h-full w-full">
-              <img src="https://daisyui.com/images/stock/photo-1550258987-190a2d41a8ba.jpg" />
-            </div>
-            <div className="carousel-item h-full w-full">
-              <img src="https://daisyui.com/images/stock/photo-1559181567-c3190ca9959b.jpg" />
-            </div>
-            <div className="carousel-item h-full w-full">
-              <img src="https://daisyui.com/images/stock/photo-1601004890684-d8cbf643f5f2.jpg" />
-            </div>
+            ))}
           </div>
         </div>
       </div>

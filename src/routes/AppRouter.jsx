@@ -23,6 +23,7 @@ import Recorder_Location from '../layouts/Pages/Recorder/Recorder_Location';
 import Recorder_Nature from '../layouts/Pages/Recorder/Recorder_Nature';
 
 import AdminRec from '../layouts/Pages/Admin/Admin_Rec'
+import Admin_New from '../layouts/Pages/Admin/Admin_New';
 
 const guestRouter = createBrowserRouter([
   {
@@ -45,6 +46,7 @@ const adminRouter = createBrowserRouter([
     children: [
       {index: true, element: <Admin_Main/>},
       { path: 'admin-rec', element: <AdminRec /> },
+      { path: 'admin-news', element: <Admin_New /> },
       { path: '*', element: <NotFound /> }
     ],
   }
