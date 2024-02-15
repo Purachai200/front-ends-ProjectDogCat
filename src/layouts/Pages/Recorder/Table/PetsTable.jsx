@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import useAuth from "../../../../hooks/useAuth";
 import axios from "axios";
 import { fetchLocation, fetchNature } from "../../../../services/recorder/recorder_fetch";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function PetsTable(owner_id) {
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -148,8 +149,8 @@ export default function PetsTable(owner_id) {
               </a>
             </div>
             <div className="flex gap-4 mt-6">
-            <form onSubmit={handleEditSubmit}>
-              <div className="flex gap-4 mt-6">
+            <form onSubmit={handleEditSubmit} className="w-full flex justify-center gap-8">
+              <div className="flex gap-4 flex-col">
                 <input
                   type="text"
                   placeholder="ชื่อ"
@@ -181,7 +182,7 @@ export default function PetsTable(owner_id) {
                   <option value="FEMALE">ตัวเมีย</option>
                 </select>
               </div>
-              <div className="flex mt-4 gap-4">
+              <div className="flex gap-4 flex-col">
                 <input
                   type="text"
                   placeholder="สี"
@@ -207,7 +208,7 @@ export default function PetsTable(owner_id) {
                   onChange={hdlEditChange}
                 />
               </div>
-            <div className="flex flex-col justify-center p-2">
+            <div className="flex flex-col justify-center gap-4">
               {/* Vaccine */}
                 <div className="flex items-center">
                   <div className="text-l">ประวัติการฉีดวัคซีน :</div>
@@ -292,7 +293,7 @@ export default function PetsTable(owner_id) {
                 </div>
               </div>
                 <button type="submit" className="btn btn-outline btn-success mt-2">
-                  ส่ง
+                  ส่ง <FontAwesomeIcon className="text-xl" icon={"check-circle"}/>
                 </button>
               </div>
             </form>
@@ -304,7 +305,7 @@ export default function PetsTable(owner_id) {
       <div className="overflow-x-auto overflow-y-scroll max-h-96 w-full p-2">
         <div className="flex justify-end">
         <button className="btn btn-outline btn-success" onClick={()=>{fetchData()}}>
-                  รีเฟรชข้อมูล
+                  รีเฟรช <FontAwesomeIcon className="text-xl" icon={"refresh"}/>
           </button>
         </div>
         <table className="table">
@@ -346,7 +347,7 @@ export default function PetsTable(owner_id) {
                       setIsEditOpen(true);
                     }}
                   >
-                    แก้ไข
+                    <FontAwesomeIcon className="text-xl" icon={"file-edit"}/>
                   </a>
                   <a className="btn btn-circle btn-outline btn-error"
                   onClick={() =>
@@ -357,7 +358,7 @@ export default function PetsTable(owner_id) {
                         await hdlDelete(row.id);
                       }
                     )
-                  }>ลบ</a>
+                  }><FontAwesomeIcon className="text-xl" icon={"trash-alt"}/></a>
                 </div>
               </td>
             </tr>

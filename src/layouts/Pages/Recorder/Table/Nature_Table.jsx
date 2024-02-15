@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useAuth from "../../../../hooks/useAuth";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Nature_Table() {
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -176,7 +177,7 @@ export default function Nature_Table() {
                   className="input input-bordered w-full max-w-xs"
                 />
                 <button type="submit" className="btn btn-outline btn-success">
-                  ส่ง
+                  ส่ง <FontAwesomeIcon className="text-xl" icon={"check-circle"}/>
                 </button>
               </div>
             </form>
@@ -213,7 +214,7 @@ export default function Nature_Table() {
                     className="input input-bordered w-full max-w-xs"
                   />
                   <button type="submit" className="btn btn-outline btn-success">
-                    ส่ง
+                    ส่ง <FontAwesomeIcon className="text-xl" icon={"check-circle"}/>
                   </button>
                 </div>
               </form>
@@ -227,7 +228,7 @@ export default function Nature_Table() {
           className="btn btn-outline btn-success"
           onClick={() => setIsAddOpen(true)}
         >
-          เพิ่ม
+          เพิ่ม <FontAwesomeIcon className="text-xl" icon={"plus"}/>
         </a>
       </div>
       <div className="overflow-x-auto overflow-y-scroll max-h-96 w-full p-2">
@@ -253,7 +254,7 @@ export default function Nature_Table() {
                         setIsEditOpen(true);
                       }}
                     >
-                      แก้ไข
+                      <FontAwesomeIcon className="text-xl" icon={"edit"}/>
                     </a>
                     <a
                       className="btn btn-circle btn-outline btn-error"
@@ -267,7 +268,7 @@ export default function Nature_Table() {
                         )
                       }
                     >
-                      ลบ
+                      <FontAwesomeIcon className="text-xl" icon={"trash-alt"}/> 
                     </a>
                   </div>
                 </td>

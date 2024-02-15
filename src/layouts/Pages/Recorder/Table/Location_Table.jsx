@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useAuth from "../../../../hooks/useAuth";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Location_Table() {
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -236,7 +237,7 @@ export default function Location_Table() {
                     className="input input-bordered w-full max-w-xs"
                   />
                   <button type="submit" className="btn btn-outline btn-success">
-                    ส่ง
+                    ส่ง <FontAwesomeIcon className="text-xl" icon={"check-circle"}/>
                   </button>
                 </div>
               </form>
@@ -278,7 +279,7 @@ export default function Location_Table() {
                         setIsEditOpen(true);
                       }}
                     >
-                      แก้ไข
+                      <FontAwesomeIcon className="text-xl" icon={"edit"}/>
                     </a>
                     <a
                       className="btn btn-circle btn-outline btn-error"
@@ -292,7 +293,7 @@ export default function Location_Table() {
                         )
                       }
                     >
-                      ลบ
+                      <FontAwesomeIcon className="text-xl" icon={"trash-alt"}/>
                     </a>
                   </div>
                 </td>

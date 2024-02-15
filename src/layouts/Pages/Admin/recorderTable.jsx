@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import useAuth from "../../../hooks/useAuth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function subdistrictTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -378,7 +379,7 @@ export default function subdistrictTable() {
             className="btn btn-outline btn-success"
             onClick={() => setIsOpen(true)}
           >
-            เพิ่ม
+            เพิ่ม <FontAwesomeIcon className="text-xl" icon={"plus"}/>
           </div>
         </div>
         <table className="table">
@@ -417,7 +418,7 @@ export default function subdistrictTable() {
                         setEditOpen(true);
                       }}
                     >
-                      แก้ไข
+                      <FontAwesomeIcon className="text-xl" icon={"edit"}/>
                     </button>
                     <button
                       className="btn btn-ghost btn-xs"
@@ -431,7 +432,7 @@ export default function subdistrictTable() {
                         )
                       }
                     >
-                      ลบ
+                      <FontAwesomeIcon className="text-xl" icon={"trash-alt"}/>
                     </button>
                   </div>
                 </td>

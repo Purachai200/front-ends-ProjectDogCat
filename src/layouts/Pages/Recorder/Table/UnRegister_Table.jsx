@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import PetsTable from "./PetsTable";
 import useAuth from "../../../../hooks/useAuth";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Register_Table() {
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -383,7 +384,7 @@ export default function Register_Table() {
                 </div>
                 <div className="flex mt-4 justify-end">
                   <button type="submit" className="btn btn-outline btn-success">
-                    ส่ง
+                    ส่ง <FontAwesomeIcon className="text-xl" icon={"check-circle"}/>
                   </button>
                 </div>
               </form>
@@ -397,7 +398,7 @@ export default function Register_Table() {
           className="btn btn-outline btn-success"
           onClick={() => setIsAddOpen(true)}
         >
-          เพิ่ม
+          เพิ่ม <FontAwesomeIcon className="text-xl" icon={"plus"}/>
         </a>
       </div>
       <div className="overflow-x-auto overflow-y-scroll max-h-[600px] w-full p-2">
@@ -455,7 +456,7 @@ export default function Register_Table() {
                         setIsEditOpen(true);
                       }}
                     >
-                      แก้ไข
+                      <FontAwesomeIcon className="text-xl" icon={"edit"}/>
                     </a>
                     <a
                       className="btn btn-circle btn-outline btn-error"
@@ -469,7 +470,7 @@ export default function Register_Table() {
                         )
                       }
                     >
-                      ลบ
+                      <FontAwesomeIcon className="text-xl" icon={"trash-alt"}/>
                     </a>
                   </div>
                 </td>
