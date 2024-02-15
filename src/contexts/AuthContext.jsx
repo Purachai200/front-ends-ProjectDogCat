@@ -27,7 +27,7 @@ function AuthContextProvider(props) {
           let userResponse = adminResponse.data;
           setUser(userResponse);
         } catch (err) {
-          console.error(err.message);
+          // console.error(err.message);
         }
         try {
           const recorderResponse = await axios.get(`${baseUrl}/auth/get-recorder`, {
@@ -36,7 +36,7 @@ function AuthContextProvider(props) {
           let userResponse = recorderResponse.data;
           setUser(userResponse);
         } catch (err) {
-          console.error(err.message);
+          // console.error(err.message);
         }
       } catch (err) {
         console.log(err.message)

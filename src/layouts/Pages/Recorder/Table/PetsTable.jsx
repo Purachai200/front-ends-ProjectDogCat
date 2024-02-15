@@ -9,6 +9,8 @@ export default function PetsTable(owner_id) {
   const [location, setLocation] = useState([])
   const [nature, setNature] = useState([])
 
+  const [editPet, setEditPet] = useState([])
+
   const { baseUrl, alertSW, alertQuestion, user } = useAuth();
 
   useEffect(() => {
@@ -39,17 +41,91 @@ export default function PetsTable(owner_id) {
     }
   };
 
-  const handleEditSubmit = (e) => {
+  const fetchEditData = async (id) => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+
+      const result = await axios.get(
+        `${baseUrl}/recorder/get/table/pet/from/id/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setEditPet(result.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+    // Update
+
+    const hdlEditChange = (e) => {
+      setEditPet((prevInput) => ({
+        ...prevInput,
+        [e.target.name]: e.target.value,
+      }));
+    };
+
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted");
-    // Close the modal
-    setIsEditOpen(false);
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      if(
+        editPet.name === "" ||
+        editPet.type === "" ||
+        editPet.gender === "" ||
+        editPet.color === "" ||
+        editPet.defect === "" ||
+        editPet.age === "" ||
+        editPet.vaccined === "" ||
+        editPet.vaccine_date === "" ||
+        editPet.sterilized === "" ||
+        editPet.location_id === "" ||
+        editPet.nature_id === ""
+      ){
+        alertSW("มีบางอย่างผิดพลาด", "กรุณากรอกข้อมูลให้ครบถ้วน", "error");
+        return;
+      }
+      const { id, petOwnerId, recorderId, ...postData } = editPet;
+      await axios.patch(
+        `${baseUrl}/recorder/update-pet/${editPet.id}`,
+        postData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alertSW("เสร็จสิ้น", "แก้ไขข้อมูลสัตว์เลี้ยงเสร็จสิ้น", "success");
+      fetchData()
+      setIsEditOpen(false);
+    } catch (err) {
+      console.log(err)
+    }
   };
 
   const handleEditClose = () => {
-    // Close the modal
     setIsEditOpen(false);
+  };
+
+  // Delete
+  const hdlDelete = async (id) => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+      await axios.delete(`${baseUrl}/recorder/delete-pet/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchData();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -76,52 +152,146 @@ export default function PetsTable(owner_id) {
               <div className="flex gap-4 mt-6">
                 <input
                   type="text"
-                  placeholder="หมู่ที่"
+                  placeholder="ชื่อ"
                   className="input input-bordered w-full max-w-xs"
+                  name="name"
+                  value={editPet.name}
+                  onChange={hdlEditChange}
                 />
-                <input
-                  type="text"
-                  placeholder="ตำบล"
-                  className="input input-bordered w-full max-w-xs"
-                />
+                <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                name="type"
+                value={editPet.type}
+                onChange={hdlEditChange}
+                >
+                <option value="" disabled>
+                    กรุณาเลือกประเภท
+                  </option>
+                  <option value="DOG">หมา</option>
+                  <option value="CAT">แมว</option>
+                </select>
+                <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                name="gender"
+                value={editPet.gender}
+                onChange={hdlEditChange}
+                >
+                  <option value="" disabled>
+                    กรุณาเลือกเพศ
+                  </option>
+                  <option value="MALE">ตัวผู้</option>
+                  <option value="FEMALE">ตัวเมีย</option>
+                </select>
               </div>
               <div className="flex mt-4 gap-4">
                 <input
                   type="text"
-                  placeholder="ชื่อผู้ให้ข้อมูล"
+                  placeholder="สี"
                   className="input input-bordered w-full max-w-xs"
+                  name="color"
+                  value={editPet.color}
+                  onChange={hdlEditChange}
                 />
                 <input
                   type="text"
-                  placeholder="สุนัขจำนวน"
+                  placeholder="ลักษณะเฉพาะ"
                   className="input input-bordered w-full max-w-xs"
+                  name="defect"
+                  value={editPet.defect}
+                  onChange={hdlEditChange}
                 />
                 <input
                   type="text"
-                  placeholder="แมวจำนวน"
+                  placeholder="อายุ"
                   className="input input-bordered w-full max-w-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="ประวัติการฉีดวัคซีน"
-                  className="input input-bordered w-full max-w-xs"
+                  name="age"
+                  value={editPet.age}
+                  onChange={hdlEditChange}
                 />
               </div>
-              <div className="flex mt-4 gap-4">
-                <input
-                  type="text"
-                  placeholder="วัคซีนครั้ล่าสุดประมาณ"
-                  className="input input-bordered w-full max-w-xs"
-                />
-                <select>
-                  <option value="someOption">เคยทำหมัน</option>
-                  <option value="otherOption">ไม่เคยทำหมัน</option>
-                </select>
-                <select>
-                  <option value="someOption">วัด</option>
-                  <option value="otherOption">อนามัย</option>
-                </select>
-                <button type="submit" className="btn btn-outline btn-success">
+            <div className="flex flex-col justify-center p-2">
+              {/* Vaccine */}
+                <div className="flex items-center">
+                  <div className="text-l">ประวัติการฉีดวัคซีน :</div>
+                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                  name="vaccined"
+                  value={editPet.vaccined}
+                  onChange={hdlEditChange}
+                  >
+                  <option value="" disabled>
+                    กรุณาเลือกประวัติการฉีดวัคซีน
+                  </option>
+                    <option value="VACCINED">เคยฉีด</option>
+                    <option value="NOT_VACCINED">ไม่เคยฉีด</option>
+                  </select>
+                </div>
+                <div className="flex items-center">
+                  <div className="text-l">ฉีดครั้งล่าสุดประมาณปี :</div>
+                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                  name="vaccine_date"
+                  value={editPet.vaccine_date}
+                  onChange={hdlEditChange}
+                  >
+                  <option value="" disabled>
+                    กรุณาเลือกปีที่ฉีดวัคซีน
+                  </option>
+                    <option value="2561">ปี 2561</option>
+                    <option value="2562">ปี 2562</option>
+                    <option value="2563">ปี 2563</option>
+                    <option value="2564">ปี 2564</option>
+                  </select>
+                </div>
+              {/* Location MAP */}
+                <div className="flex items-center">
+                  <div className="text-l">สถานที่ : </div>
+                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                  name="location_id"
+                  value={editPet.location_id}
+                  onChange={hdlEditChange}
+                  >
+                  <option value="" disabled>
+                    กรุณาเลือกสถานที่เลี้ยงดู
+                  </option>
+                  {location.map((row, index) => (
+                    <option key={index} value={row.id}>
+                      {row.name_location}
+                    </option>
+                  ))}
+                  </select>
+                </div>
+                {/* Nature MAP */}
+                <div className="flex items-center">
+                  <div className="text-l">ลักษณะการเลี้ยง : </div>
+                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                  name="nature_id"
+                  value={editPet.nature_id}
+                  onChange={hdlEditChange}
+                  >
+                  <option value="" disabled>
+                    กรุณาเลือกลักษณะการเลี้ยง
+                  </option>
+                  {nature.map((row, index) => (
+                    <option key={index} value={row.id}>
+                      {row.name_nature}
+                    </option>
+                  ))}
+                  </select>
+                </div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center">
+                  <div className="text-l">ประวัติการทำหมัน : </div>
+                  <select className="p-2 bg-base-100 rounded-box transition-all hover:bg-base-300"
+                    name="sterilized"
+                    value={editPet.sterilized}
+                    onChange={hdlEditChange}
+                    >
+                  <option value="" disabled>
+                    กรุณาเลือกประวัติการทำหมัน
+                  </option>
+                    <option value="STERILIZED">เคยทำหมัน</option>
+                    <option value="NOT_STERILIZED">ไม่เคยทำหมัน</option>
+                  </select>
+                </div>
+              </div>
+                <button type="submit" className="btn btn-outline btn-success mt-2">
                   ส่ง
                 </button>
               </div>
@@ -155,20 +325,39 @@ export default function PetsTable(owner_id) {
             {data.map((row, index) => (
               <tr key={index}>
               <th>{row.name}</th>
-              <td>{row.type}</td>
-              <td>{row.gender}</td>
+              <td>{row.type === "DOG"
+                ? "หมา"
+                : "แมว"
+              }
+              </td>
+              <td>{row.gender === "MALE"
+              ? "ตัวผู้"
+              : "ตัวเมีย"
+              }</td>
               <td>{row.color}</td>
               <td>{row.defect}</td>
-              <td>{row.age}</td>
+              <td>{row.age} ปี</td>
               <td className="max-w-4">
                 <div className="flex justify- gap-4">
                   <a
                     className="btn btn-circle btn-outline btn-warning"
-                    onClick={() => setIsEditOpen(true)}
+                    onClick={async () => {
+                      await fetchEditData(row.id);
+                      setIsEditOpen(true);
+                    }}
                   >
                     แก้ไข
                   </a>
-                  <a className="btn btn-circle btn-outline btn-error">ลบ</a>
+                  <a className="btn btn-circle btn-outline btn-error"
+                  onClick={() =>
+                    alertQuestion(
+                      "ต้องการลบไฟล์หรือไม่",
+                      "ต้องการลบผู้บันทึกนี้ใช่หรือไม่ ?",
+                      async () => {
+                        await hdlDelete(row.id);
+                      }
+                    )
+                  }>ลบ</a>
                 </div>
               </td>
             </tr>

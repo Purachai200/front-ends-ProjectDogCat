@@ -15,10 +15,10 @@ export const fetchAddress = async (baseUrl, token) => {
   }
 };
 
-export const fetchPetOwner = async (baseUrl, token, addressId) => {
+export const fetchAllAddress = async (baseUrl, token) => {
   try {
     const result = await axios.get(
-      `${baseUrl}/recorder/getByData/table/pet_owner/from/addressId/`,
+      `${baseUrl}/recorder/get/address`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -29,6 +29,53 @@ export const fetchPetOwner = async (baseUrl, token, addressId) => {
     return [];
   }
 };
+
+export const fetchAllPetOwner = async (baseUrl, token) => {
+  try {
+    const result = await axios.get(
+      `${baseUrl}/recorder/get/pet_owner`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return result.data;
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
+
+export const fetchAllPet = async (baseUrl, token) => {
+  try {
+    const result = await axios.get(
+      `${baseUrl}/recorder/get/pet`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return result.data;
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
+
+export const fetchAllUnregisterPet = async (baseUrl, token) => {
+  try {
+    const result = await axios.get(
+      `${baseUrl}/recorder/get/unregistered`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return result.data;
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
+
+
 
 export const fetchNature = async (baseUrl, token) => {
   try {
