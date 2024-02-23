@@ -10,7 +10,7 @@ const AuthContext = createContext();
 function AuthContextProvider(props) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const baseUrl = "http://localhost:8000";
+  const baseUrl = "https://express-prisma-projectdogcat.onrender.com";
 
   useEffect(() => {
     const fetchData = async () => {
