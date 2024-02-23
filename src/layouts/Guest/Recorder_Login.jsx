@@ -70,19 +70,19 @@ export default function Recorder_Login() {
     <div>
       <div className="min-h-0 flex justify-between items-center">
         <div className="container">
-          <div className="h-screen p-0 flex flex-col justify-center items-center">
-            <div className="max-h-[70%] m-1 carousel carousel-vertical rounded-box">
+          <div className="container h-screen p-0 flex justify-center items-center">
+            <div className="h-3/4 m-1 carousel carousel-vertical rounded-box">
               {news.map((row, index) => (
                 <div key={index} className="carousel-item h-full w-full">
                   <img src={row.url} />
                 </div>
               ))}
             </div>
-            <div className="bottom-0 self-start p-2 mt-4">
+            {/* <div className="bottom-0 self-start p-2 mt-4">
               <Link to={"/"} className="btn btn-outline btn-accent">
                 ย้อนกลับ
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="container min-h-screen flex flex-col justify-center items-center">

@@ -63,6 +63,7 @@ export default function NewsTable() {
       formData.append("title", input.title);
       formData.append("image", input.image);
 
+      setIsOpen(false);
       await axios.post(`${baseUrl}/admin/news`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -76,7 +77,7 @@ export default function NewsTable() {
         image: null,
       });
       fetchData();
-      setIsOpen(false);
+      
     } catch (err) {
       console.log(err);
     }
