@@ -8,7 +8,7 @@ export default function adminNavbar() {
       <div className="flex-1 justify-end">
         <Link to={"/"} className="flex items-center">
           <div>
-          <img src="../../src/assets/logo_dog_cat.png" alt="" className="avatar border rounded-full size-20 img-title"/>
+          <img src="../src/assets/logo_dog_cat.png" alt="" className="avatar border rounded-full size-20 img-title"/>
           </div>
           <div className="flex-col">
           <div className="btn btn-ghost block text-4xl text-title">
