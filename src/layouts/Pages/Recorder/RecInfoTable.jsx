@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import {
-  fetchAllAddress,
-  fetchAllPet,
-  fetchAllPetOwner,
+  fetchAddress,
+  fetchPet,
+  fetchPetOwner,
 } from "../../../services/recorder/recorder_fetch";
 import useAuth from "../../../hooks/useAuth";
 
@@ -18,6 +18,12 @@ export default function RecInfoTable() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (ownerData.length > 0) {
+      fetchPetData();
+    }
+  }, [ownerData]);
+
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("DogAndCattoken");
@@ -25,13 +31,24 @@ export default function RecInfoTable() {
         return;
       }
 
-      const petOwnerData = await fetchAllPetOwner(baseUrl, token);
-      setOwnerData(petOwnerData);
-
-      const addressData = await fetchAllAddress(baseUrl, token);
+      const addressData = await fetchAddress(baseUrl, token);
       setAddress(addressData);
 
-      const petData = await fetchAllPet(baseUrl, token);
+      const petOwnerData = await fetchPetOwner(baseUrl, token, addressData);
+      setOwnerData(petOwnerData);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchPetData = async () => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+
+      const petData = await fetchPet(baseUrl, token, ownerData);
       setPet(petData);
     } catch (err) {
       console.log(err);
@@ -71,38 +88,34 @@ export default function RecInfoTable() {
             </thead>
             <tbody>
               {/* Map Data Registered */}
-              {ownerData
-                .sort((a, b) => a.first_name.localeCompare(b.first_name))
-                .map((row, index) => (
-                  <tr key={index}>
-                    <td>
-                      {address.map((item, index) => {
-                        if (item.id === row.addressId) {
-                          return <p key={index}>{item.house_number}</p>;
-                        }
-                      })}
-                    </td>
-                    <td>
-                      {row.first_name} {row.last_name}
-                    </td>
-                    <td className="text-center">
-                      {
-                        pet.filter(
-                          (item) =>
-                            item.petOwnerId === row.id && item.type === "DOG"
-                        ).length
-                      }
-                    </td>
-                    <td className="text-center">
-                      {
-                        pet.filter(
-                          (item) =>
-                            item.petOwnerId === row.id && item.type === "CAT"
-                        ).length
-                      }
-                    </td>
-                  </tr>
-                ))}
+              {ownerData.map((owners, index) =>
+                owners.map((row, rowIndex) => {
+                  let numDogs = 0;
+                  let numCats = 0;
+                  pet.forEach((item) => {
+                    if (item.petOwnerId === row.id) {
+                      if (item.type === "DOG") numDogs++;
+                      else if (item.type === "CAT") numCats++;
+                    }
+                  });
+                  return (
+                    <tr key={`${index}-${rowIndex}`}>
+                      <td>
+                        {address
+                          .filter((item) => item.id === row.addressId)
+                          .map((item, addressIndex) => (
+                            <p key={addressIndex}>{item.house_number}</p>
+                          ))}
+                      </td>
+                      <td>
+                        {row.first_name} {row.last_name}
+                      </td>
+                      <td className="text-center">{numDogs}</td>
+                      <td className="text-center">{numCats}</td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         ) : (
@@ -111,51 +124,59 @@ export default function RecInfoTable() {
             <thead>
               <tr>
                 <th>บ้านแลขที่</th>
-                <th>ชื่อ</th>
-                <th></th>
-                <th></th>
+                <th>ชื่อ - สกุล</th>
+                <th>จำนวนหมา</th>
+                <th>จำนวนแมว</th>
               </tr>
             </thead>
             <tbody>
               {/* Map Data Registered */}
               {ownerData
-                .filter((owner) => {
-                  const addressOfOwner = address.find(
-                    (addr) => addr.id === owner.addressId
-                  );
-                  return addressOfOwner && addressOfOwner.moo === selectedMoo;
+                .filter((owners) =>
+                  owners.some((owner) => {
+                    const addressOfOwner = address.find(
+                      (addr) => addr.id === owner.addressId
+                    );
+                    return addressOfOwner && addressOfOwner.moo === selectedMoo;
+                  })
+                )
+                .sort((a, b) => {
+                  const aMoo = address.find(
+                    (addr) => addr.id === a[0].addressId
+                  ).moo;
+                  const bMoo = address.find(
+                    (addr) => addr.id === b[0].addressId
+                  ).moo;
+                  return aMoo.localeCompare(bMoo);
                 })
-                .sort((a, b) => a.first_name.localeCompare(b.first_name))
-                .map((owner, index) => (
-                  <tr key={index}>
-                    <td>
-                      {address.map((item, index) => {
-                        if (item.id === owner.addressId) {
-                          return <p key={index}>{item.house_number}</p>;
-                        }
-                      })}
-                    </td>
-                    <td>
-                      {owner.first_name} {owner.last_name}
-                    </td>
-                    <td className="text-center">
-                      {
-                        pet.filter(
-                          (item) =>
-                            item.petOwnerId === owner.id && item.type === "DOG"
-                        ).length
+                .map((owners, index) =>
+                  owners.map((row, rowIndex) => {
+                    let numDogs = 0;
+                    let numCats = 0;
+                    pet.forEach((item) => {
+                      if (item.petOwnerId === row.id) {
+                        if (item.type === "DOG") numDogs++;
+                        else if (item.type === "CAT") numCats++;
                       }
-                    </td>
-                    <td className="text-center">
-                      {
-                        pet.filter(
-                          (item) =>
-                            item.petOwnerId === owner.id && item.type === "CAT"
-                        ).length
-                      }
-                    </td>
-                  </tr>
-                ))}
+                    });
+                    return (
+                      <tr key={`${index}-${rowIndex}`}>
+                        <td>
+                          {address
+                            .filter((item) => item.id === row.addressId)
+                            .map((item, addressIndex) => (
+                              <p key={addressIndex}>{item.house_number}</p>
+                            ))}
+                        </td>
+                        <td>
+                          {row.first_name} {row.last_name}
+                        </td>
+                        <td className="text-center">{numDogs}</td>
+                        <td className="text-center">{numCats}</td>
+                      </tr>
+                    );
+                  })
+                )}
             </tbody>
           </table>
         )}
