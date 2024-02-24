@@ -159,7 +159,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-0 flex justify-between items-center">
+    <div className="min-h-0 flex justify-between items-center content-native">
       <div className="container">
         <div className="container h-screen p-0 flex justify-center items-center">
           <div className="h-3/4 m-1 carousel carousel-vertical rounded-box">

@@ -121,12 +121,12 @@ export default function NewsTable() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">เพิ่มข่าวสาร</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={handleClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="flex flex-col gap-4 mt-6 w-full">

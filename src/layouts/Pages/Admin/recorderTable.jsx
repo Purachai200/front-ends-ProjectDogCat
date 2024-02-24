@@ -214,12 +214,12 @@ export default function subdistrictTable() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">เพิ่มผู้บันทึก</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={handleClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="flex gap-4 mt-6">
@@ -300,12 +300,12 @@ export default function subdistrictTable() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">แก้ไขผู้บันทึก</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={editClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <form onSubmit={editSubmit}>
               <div className="flex gap-4 mt-6">

@@ -141,12 +141,12 @@ export default function PetsTable(owner_id) {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">แก้ไขสัตว์เลี้ยง</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={handleEditClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <div className="flex gap-4 mt-6">
             <form onSubmit={handleEditSubmit} className="w-full flex justify-center gap-8">
@@ -340,7 +340,7 @@ export default function PetsTable(owner_id) {
               <td>{row.age} ปี</td>
               <td className="max-w-4">
                 <div className="flex justify- gap-4">
-                  <a
+                  <div
                     className="btn btn-circle btn-outline btn-warning"
                     onClick={async () => {
                       await fetchEditData(row.id);
@@ -348,8 +348,8 @@ export default function PetsTable(owner_id) {
                     }}
                   >
                     <FontAwesomeIcon className="text-xl" icon={"file-edit"}/>
-                  </a>
-                  <a className="btn btn-circle btn-outline btn-error"
+                  </div>
+                  <div className="btn btn-circle btn-outline btn-error"
                   onClick={() =>
                     alertQuestion(
                       "ต้องการลบไฟล์หรือไม่",
@@ -358,7 +358,7 @@ export default function PetsTable(owner_id) {
                         await hdlDelete(row.id);
                       }
                     )
-                  }><FontAwesomeIcon className="text-xl" icon={"trash-alt"}/></a>
+                  }><FontAwesomeIcon className="text-xl" icon={"trash-alt"}/></div>
                 </div>
               </td>
             </tr>

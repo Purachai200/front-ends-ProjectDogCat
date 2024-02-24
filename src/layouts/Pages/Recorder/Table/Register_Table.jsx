@@ -362,12 +362,12 @@ export default function Register_Table() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">เพิ่มที่อยู่</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={handleClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="flex gap-4 mt-6">
@@ -468,12 +468,12 @@ export default function Register_Table() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">แก้ไขที่อยู่และเพิ่มสัตว์เลี้ยง</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={handleEditClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <div className="flex gap-4 mt-6">
               <input
@@ -590,12 +590,12 @@ export default function Register_Table() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">เพิ่มสัตว์เลี้ยง</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={handlePetClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <form onSubmit={handlePetSubmit}>
               <div className="flex gap-4 mt-6">
@@ -769,7 +769,7 @@ export default function Register_Table() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">แก้ไขที่อยู่</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={async () => {
                   await fetchEditPetOwner(addressData.id);
@@ -777,7 +777,7 @@ export default function Register_Table() {
                 }}
               >
                 X
-              </a>
+              </div>
             </div>
             <form onSubmit={handleOwnerEdit}>
               <div className="flex gap-4 mt-6">
@@ -883,13 +883,13 @@ export default function Register_Table() {
           ))}
         </select>
 
-        <a
+        <div
           className="btn btn-outline btn-success"
           onClick={() => setIsAddOpen(true)}
         >
           เพิ่ม
           <FontAwesomeIcon icon={"plus"}/>
-        </a>
+        </div>
       </div>
       <div className="overflow-x-auto overflow-y-scroll max-h-[600px] w-full p-2">
         {selectedMoo.length === 0 ? (
@@ -913,7 +913,7 @@ export default function Register_Table() {
                     <td>{row.house_name}</td>
                     <td className="max-w-4">
                       <div className="flex justify- gap-4 ">
-                        <a
+                        <div
                           className="btn btn-circle btn-outline btn-warning"
                           onClick={async () => {
                             await fetchEditPetOwner(row.id);
@@ -921,8 +921,8 @@ export default function Register_Table() {
                           }}
                         >
                           <FontAwesomeIcon className="text-xl" icon={"edit"}/>
-                        </a>
-                        <a
+                        </div>
+                        <div
                           className="btn btn-circle btn-outline btn-error"
                           onClick={() =>
                             alertQuestion(
@@ -935,7 +935,7 @@ export default function Register_Table() {
                           }
                         >
                           <FontAwesomeIcon className="text-xl" icon={"trash-alt"}/>
-                        </a>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -964,7 +964,7 @@ export default function Register_Table() {
                     <td>{row.house_name}</td>
                     <td className="max-w-4">
                       <div className="flex justify- gap-4 ">
-                        <a
+                        <div
                           className="btn btn-circle btn-outline btn-warning"
                           onClick={async () => {
                             await fetchEditPetOwner(row.id);
@@ -972,8 +972,8 @@ export default function Register_Table() {
                           }}
                         >
                           <FontAwesomeIcon className="text-xl" icon={"edit"}/>
-                        </a>
-                        <a
+                        </div>
+                        <div
                           className="btn btn-circle btn-outline btn-error"
                           onClick={() =>
                             alertQuestion(
@@ -986,7 +986,7 @@ export default function Register_Table() {
                           }
                         >
                           <FontAwesomeIcon className="text-xl" icon={"trash-alt"}/>
-                        </a>
+                        </div>
                       </div>
                     </td>
                   </tr>

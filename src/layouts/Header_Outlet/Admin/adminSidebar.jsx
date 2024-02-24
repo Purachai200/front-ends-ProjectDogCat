@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function adminSidebar() {
   const navigate = useNavigate()
@@ -12,6 +13,7 @@ export default function adminSidebar() {
   }
   
   return (
+    <div>
     <div>
       <ul className="menu menu-lg bg-base-200 w-56 rounded-box h-screen">
         <div className="h-20 flex items-center justify-center">
@@ -56,8 +58,25 @@ export default function adminSidebar() {
             ข่าวสาร
           </Link>
         </li>
-      <a className="btn btn-outline btn-error mt-auto" onClick={Logout}>ออกจากระบบ</a>
+      <div className="btn btn-outline btn-error mt-auto" onClick={Logout}>ออกจากระบบ</div>
       </ul>
+    </div>
+    <div className="bottom-nav">
+        <div className="btm-nav">
+          <Link to={"/"}>
+            <FontAwesomeIcon className="text-xl hover:text-green-400 transition-all" icon={"home-alt"}/>
+          </Link>
+          <Link to={"/admin-rec"}>
+            <FontAwesomeIcon className="text-xl  hover:text-green-400 transition-all" icon={"user-group"}/>
+          </Link>
+          <Link to={"/admin-news"}>
+            <FontAwesomeIcon className="text-xl  hover:text-green-400 transition-all" icon={"newspaper"}/>
+          </Link>
+          <div onClick={Logout}>
+            <FontAwesomeIcon className="text-xl text-red-500" icon={"sign-out-alt"}/>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

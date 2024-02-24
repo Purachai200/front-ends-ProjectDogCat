@@ -6,10 +6,17 @@ export default function adminNavbar() {
     <div>
       <div className="navbar bg-neutral text-neutral-content">
       <div className="flex-1 justify-end">
-        <div className="flex-col">
-        <Link to={'/'} className="btn btn-ghost block text-4xl">ระบบจัดการข้อมูลสุนัขและแมว</Link>
-        <a className="p-5">Dog & Cat Management System</a>
-        </div>
+        <Link to={"/"} className="flex items-center">
+          <div>
+          <img src="../../src/assets/logo_dog_cat.png" alt="" className="avatar border rounded-full size-20 img-title"/>
+          </div>
+          <div className="flex-col">
+          <div className="btn btn-ghost block text-4xl text-title">
+            ระบบจัดการข้อมูลสุนัขและแมว
+          </div>
+          <div className="p-5 text-title">Dog & Cat Management System</div>
+          </div>
+        </Link>
       </div>
       </div>
     </div>

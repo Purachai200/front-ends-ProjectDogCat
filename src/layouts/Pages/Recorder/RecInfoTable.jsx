@@ -39,7 +39,7 @@ export default function RecInfoTable() {
   };
 
   return (
-    <div>
+    <div className="content-native">
       <div className="flex justify-between items-center mb-3">
         <div className="text-xl">ตารางข้อมูลเจ้าของสัตว์</div>
         <select

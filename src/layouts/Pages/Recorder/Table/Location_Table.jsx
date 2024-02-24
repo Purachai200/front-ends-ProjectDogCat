@@ -163,12 +163,12 @@ export default function Location_Table() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">เพิ่มสัตว์ที่ไม่ได้ลงทะเบียน</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={handleClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <form onSubmit={handleSubmit}>
               <label htmlFor=""></label>
@@ -208,12 +208,12 @@ export default function Location_Table() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">แก้ไขชื่อสถานที่</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={handleEditClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <label htmlFor=""></label>
             <div className="flex gap-4 mt-6">
@@ -247,12 +247,12 @@ export default function Location_Table() {
       )}
 
       <div className="flex justify-end items-center p-2">
-        <a
+        <div
           className="btn btn-outline btn-success"
           onClick={() => setIsAddOpen(true)}
         >
           เพิ่ม
-        </a>
+        </div>
       </div>
       <div className="overflow-x-auto overflow-y-scroll max-h-96 w-full p-2">
         <table className="table">
@@ -272,7 +272,7 @@ export default function Location_Table() {
                 <td>{row.location}</td>
                 <td className="max-w-4">
                   <div className="flex justify- gap-4 ">
-                    <a
+                    <div
                       className="btn btn-circle btn-outline btn-warning"
                       onClick={async () => {
                         await fetchEditData(row.id);
@@ -280,8 +280,8 @@ export default function Location_Table() {
                       }}
                     >
                       <FontAwesomeIcon className="text-xl" icon={"edit"}/>
-                    </a>
-                    <a
+                    </div>
+                    <div
                       className="btn btn-circle btn-outline btn-error"
                       onClick={() =>
                         alertQuestion(
@@ -294,7 +294,7 @@ export default function Location_Table() {
                       }
                     >
                       <FontAwesomeIcon className="text-xl" icon={"trash-alt"}/>
-                    </a>
+                    </div>
                   </div>
                 </td>
               </tr>

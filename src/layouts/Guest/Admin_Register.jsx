@@ -50,7 +50,7 @@ export default function Admin_Register() {
 
   return (
     <div>
-      <div className="min-h-0 flex justify-between items-center">
+      <div className="min-h-0 flex justify-between items-center content-native">
         <div className="container">
           <div className="h-screen p-0 flex flex-col justify-center items-center">
             <div className="text-4xl">ลงทะเบียนผู้ดูแลระบบ</div>

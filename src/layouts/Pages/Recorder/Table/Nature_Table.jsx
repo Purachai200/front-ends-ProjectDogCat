@@ -159,12 +159,12 @@ export default function Nature_Table() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">เพิ่มลักษณะการเลี้ยง</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={handleClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="flex gap-4 mt-6 justify-between">
@@ -195,12 +195,12 @@ export default function Nature_Table() {
           <div className="modal-box">
             <div className="flex justify-between item-center">
               <div className="text-2xl">แก้ไขลักษณะการเลี้ยง</div>
-              <a
+              <div
                 className="btn btn-circle btn-outline btn-error"
                 onClick={handleEditClose}
               >
                 X
-              </a>
+              </div>
             </div>
             <div className="flex gap-4 mt-6">
               <form onSubmit={handleEditSubmit}>
@@ -224,12 +224,12 @@ export default function Nature_Table() {
       )}
 
       <div className="flex justify-end items-center p-2">
-        <a
+        <div
           className="btn btn-outline btn-success"
           onClick={() => setIsAddOpen(true)}
         >
           เพิ่ม <FontAwesomeIcon className="text-xl" icon={"plus"}/>
-        </a>
+        </div>
       </div>
       <div className="overflow-x-auto overflow-y-scroll max-h-96 w-full p-2">
         <table className="table">
@@ -247,7 +247,7 @@ export default function Nature_Table() {
                 <th>{row.name_nature}</th>
                 <td className="max-w-4">
                   <div className="flex justify- gap-4 ">
-                    <a
+                    <div
                       className="btn btn-circle btn-outline btn-warning"
                       onClick={async () => {
                         await fetchEditData(row.id);
@@ -255,8 +255,8 @@ export default function Nature_Table() {
                       }}
                     >
                       <FontAwesomeIcon className="text-xl" icon={"edit"}/>
-                    </a>
-                    <a
+                    </div>
+                    <div
                       className="btn btn-circle btn-outline btn-error"
                       onClick={() =>
                         alertQuestion(
@@ -269,7 +269,7 @@ export default function Nature_Table() {
                       }
                     >
                       <FontAwesomeIcon className="text-xl" icon={"trash-alt"}/> 
-                    </a>
+                    </div>
                   </div>
                 </td>
               </tr>

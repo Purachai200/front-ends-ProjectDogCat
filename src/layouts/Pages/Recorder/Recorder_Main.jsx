@@ -126,8 +126,8 @@ export default function Recorder_Main() {
   };
 
   return (
-    <div className="max-w-full p-2 justify-center items-center transition-all">
-      <div className="min-h-0 flex h-full justify-between">
+    <div className="max-w-full p-2 justify-center items-center transition-all ">
+      <div className="min-h-0 flex h-full justify-between content-native">
         <div className="container h-full p-0 ">
           <RecInfoTable />
         </div>
