@@ -119,6 +119,27 @@ export default function Register_Table() {
     }));
   };
 
+  const checkDuplicateIdentityNumber = async (identityNumber) => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return false;
+      }
+  
+      const response = await axios.get(
+        `${baseUrl}/recorder/getMatchString/table/pet_owner/from/identity_number/${identityNumber}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      return response.data; // ส่งค่า exists กลับเพื่อตรวจสอบภายในฟังก์ชัน handleSubmit
+    } catch (error) {
+      console.error("Error checking duplicate identity number:", error);
+      return false;
+    }
+  };  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -137,9 +158,27 @@ export default function Register_Table() {
         petOwner_input.identity_number === "" ||
         petOwner_input.tel === ""
       ) {
-        alertSW("มีบางอย่างผิดพลาด", "กรุณากรอกข้อมูลให้ครบถ้วน", "error");
+        alertSW(
+          "มีบางอย่างผิดพลาด",
+          "กรุณากรอกข้อมูลให้ครบถ้วน",
+          "error"
+        );
         return;
       }
+  
+      const isDuplicate = await checkDuplicateIdentityNumber(
+        petOwner_input.identity_number
+      );
+  
+      if (isDuplicate.length === 1) {
+        alertSW(
+          "มีบางอย่างผิดพลาด",
+          "เลขบัตรประชาชนนี้มีอยู่ในระบบแล้ว",
+          "error"
+        );
+        return;
+      }
+  
       const addressResponse = await axios.post(
         `${baseUrl}/recorder/create-address/`,
         address_input,
@@ -147,22 +186,22 @@ export default function Register_Table() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log(addressResponse);
+  
       const addressId = addressResponse.data.id;
-
+  
       if (!addressId) {
         alertSW("มีบางอย่างผิดพลาด", "ไม่สามารถสร้างที่อยู่ได้", "error");
         return;
       }
-
-      await axios.post(
+  
+      const petOwnerResponse = await axios.post(
         `${baseUrl}/recorder/create-pet-owner/${addressId}`,
         petOwner_input,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+  
       alertSW("เสร็จสิ้น", "แก้ไขข้อมูลผู้บันทึกเสร็จสิ้น", "success");
       setAddress_input({
         house_name: "",
@@ -183,6 +222,7 @@ export default function Register_Table() {
       console.log(err);
     }
   };
+  
 
   const handleClose = () => {
     setIsAddOpen(false);
@@ -891,7 +931,7 @@ export default function Register_Table() {
           <FontAwesomeIcon icon={"plus"}/>
         </div>
       </div>
-      <div className="overflow-x-auto overflow-y-scroll max-h-[600px] w-full p-2">
+      <div className="overflow-x-auto overflow-y-scroll max-h-[400px] w-full p-2">
         {selectedMoo.length === 0 ? (
           <table className="table">
             {/* head */}
