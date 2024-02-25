@@ -80,11 +80,17 @@
   .bottom-nav {
     display: block;
   }
+  .table-native {
+    max-height: 500px;
+  }
 }
 
 @media screen and (max-width: 414px) {
   .content-long-native {
     display: block;
     max-width: 400px;
+  }
+  .table-native {
+    max-height: 400px;
   }
 }
