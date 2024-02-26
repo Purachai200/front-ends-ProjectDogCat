@@ -98,12 +98,6 @@ export const fetchPet = async (baseUrl, token, petOwnerData) => {
   }
 };
 
-
-
-
-
-
-
 export const fetchAllPet = async (baseUrl, token) => {
   try {
     const result = await axios.get(
@@ -154,6 +148,22 @@ export const fetchLocation = async (baseUrl, token) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     return result.data;
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
+
+
+export const fetchSubAddress = async (baseUrl, token, user) => {
+  try {
+      const result = await axios.get(
+        `${baseUrl}/recorder/getMatch/table/subdistrict/from/id/${user.subdistrictId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return result.data
   } catch (err) {
     console.error(err);
     return [];

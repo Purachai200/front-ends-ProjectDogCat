@@ -25,7 +25,7 @@
   display: none;
 }
 
-@media screen and (max-width: 860px) {
+@media screen and (max-width: 980px) {
   .text-title {
     display: none;
   }
@@ -69,7 +69,10 @@
   }
 
   .content-native {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   .content-long-native {

@@ -4,6 +4,7 @@ import useAuth from "../../../hooks/useAuth";
 import axios from "axios";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import ExportExcel from "../../../services/recorder/exportExcel";
 
 export default function RecorderSidebar() {
   const navigate = useNavigate();
@@ -95,6 +96,9 @@ export default function RecorderSidebar() {
           </li>
           <li className="text-l">
             <Link to={"/rec-nature"}>เพิ่มลักษณะการเลี้ยง</Link>
+          </li>
+          <li className="text-l">
+          <ExportExcel fileName={"Excel Export"}/>
           </li>
           <div className="btn btn-outline btn-error mt-auto" onClick={Logout}>
             ออกจากระบบ
