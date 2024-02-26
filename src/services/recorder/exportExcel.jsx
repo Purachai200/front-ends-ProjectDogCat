@@ -35,10 +35,14 @@ const ExportExcel = ({ fileName }) => {
   const [pet, setPet] = useState([]);
   const [location, setLocation] = useState([]);
   const [nature, setNature] = useState([]);
+
+  const [isExporting, setIsExporting] = useState(false);
+
   const [excelData, setExcelData] = useState(ExcelData);
 
   useEffect(() => {
     fetchData();
+    setIsExporting(true);
   }, []);
 
   useEffect(() => {
@@ -62,7 +66,6 @@ const ExportExcel = ({ fileName }) => {
 
       const subdistrictAddress = await fetchSubAddress(baseUrl, token, user);
       setSubdistrict(subdistrictAddress);
-
     } catch (err) {
       console.log(err);
     }
@@ -88,7 +91,7 @@ const ExportExcel = ({ fileName }) => {
       const natureMap = new Map(
         natureData.map((nature) => [nature.id, nature])
       );
-      
+
       if (
         petData &&
         petData.length > 0 &&
@@ -106,7 +109,7 @@ const ExportExcel = ({ fileName }) => {
 
         const excelData = petData.map((pet) => {
           const petOwner = petOwnerMap.get(pet.petOwnerId);
-          // console.log(subdistrict)
+          console.log(subdistrict);
           // console.log(petOwner);
           if (petOwner && petOwner.addressId) {
             const address = addressMap.get(petOwner.addressId);
@@ -117,18 +120,33 @@ const ExportExcel = ({ fileName }) => {
                 เบอร์โทรศัพท์: petOwner.tel,
                 บ้านเลขที่: address.house_number || "",
                 หมู่ที่: address.moo || "",
-                ตำบล: subdistrict[0].sub_district || "",
-                อำเภอ: subdistrict[0].district || "",
-                จังหวัด: subdistrict[0].province || "",
+                ตำบล:
+                  subdistrict && subdistrict.length > 0
+                    ? subdistrict[0].sub_district || ""
+                    : "",
+                อำเภอ:
+                  subdistrict && subdistrict.length > 0
+                    ? subdistrict[0].district || ""
+                    : "",
+                จังหวัด:
+                  subdistrict && subdistrict.length > 0
+                    ? subdistrict[0].province || ""
+                    : "",
                 ซอย: address.soi || "",
                 ถนน: address.street || "",
                 ประเภทสัตว์เลี้ยง: `${pet.type === "DOG" ? "หมา" : "แมว"}`,
                 ชื่อสัตว์เลี้ยง: pet.name,
                 เพศ: `${pet.gender === "MALE" ? "ผู้" : "เมีย"}`,
                 สี: pet.color,
-                ประวัติการฉีดวัคซีน: `${pet.vaccined === "VACCINED" ? "เคยฉีด" : "ไม่เคยฉีด"}`,
+                ประวัติการฉีดวัคซีน: `${
+                  pet.vaccined === "VACCINED" ? "เคยฉีด" : "ไม่เคยฉีด"
+                }`,
                 วัคซีนครั้งล่าสุดประมาณ: pet.vaccine_date,
-                การทำหมัน: `${pet.sterilized === "STERILIZED" ? "ทำหมันแล้ว" : "ยังไม่ทำหมัน"}`,
+                การทำหมัน: `${
+                  pet.sterilized === "STERILIZED"
+                    ? "ทำหมันแล้ว"
+                    : "ยังไม่ทำหมัน"
+                }`,
                 อายุ: `${pet.age} ปี`,
                 ลักษณะการเลี้ยง: pet.natureId,
                 สถานที่เลี้ยง: pet.locationId,
@@ -151,6 +169,11 @@ const ExportExcel = ({ fileName }) => {
     }
   };
 
+  // ตั้งเวลาหยุดนับถอยหลัง
+  setTimeout(() => {
+    setIsExporting(false);
+  }, 10000);
+
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
@@ -164,8 +187,12 @@ const ExportExcel = ({ fileName }) => {
   };
 
   return (
-    <div className="btn btn-outline" onClick={exportToExcel}>
-      ส่งออก
+    <div
+      className={`btn btn-outline border-green-400 text-green-400 ${isExporting ? "disabled" : ""}`}
+      onClick={exportToExcel}
+      disabled={isExporting}
+    >
+      {isExporting ? `กำลังโหลด` : "ส่งออก"}
     </div>
   );
 };
