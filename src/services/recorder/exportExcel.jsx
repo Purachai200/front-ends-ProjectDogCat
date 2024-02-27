@@ -155,7 +155,6 @@ const ExportExcel = ({ fileName }) => {
           const petOwner = petOwnerMap.get(pet.petOwnerId);
           const location = locationMap.get(pet.locationId);
           const nature = natureMap.get(pet.natureId)
-
           if (petOwner && petOwner.addressId) {
             const address = addressMap.get(petOwner.addressId);
             if (address) {
@@ -253,26 +252,31 @@ const ExportExcel = ({ fileName }) => {
         });
   
         setExcelUnreg(excelData.filter((data) => data !== null));
+        // console.log(excelData)
       } else {
         console.log("No pet data found.");
+        return[]
       }
     } catch (err) {
       console.log(err);
     }
   }  
 
-  const fileType =
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
-
+  
   const exportToExcel = () => {
     const wb = XLSX.utils.book_new();
   
-    const ws = XLSX.utils.json_to_sheet(excelData);
-    XLSX.utils.book_append_sheet(wb, ws, "สัตว์มีเจ้าของ");
+    if (excelData && excelData.length > 0) {
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      XLSX.utils.book_append_sheet(wb, ws, "สัตว์มีเจ้าของ");
+    }
   
-    const ws2 = XLSX.utils.json_to_sheet(excelUnreg);
-    XLSX.utils.book_append_sheet(wb, ws2, "สัตว์ไม่มีเจ้าของ");
+    if (excelUnreg && excelUnreg.length > 0) {
+      const ws2 = XLSX.utils.json_to_sheet(excelUnreg);
+      XLSX.utils.book_append_sheet(wb, ws2, "สัตว์ไม่มีเจ้าของ");
+    }
   
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const data = new Blob([excelBuffer], { type: fileType });

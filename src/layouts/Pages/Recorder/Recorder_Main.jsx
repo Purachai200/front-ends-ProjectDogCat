@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import RecInfoTable from "./RecInfoTable";
 import useAuth from "../../../hooks/useAuth";
 import {
-  fetchAllPet,
-  fetchAllUnregisterPet,
+  fetchAddress,
+  fetchPet,
+  fetchPetOwner,
+  fetchUnregister,
 } from "../../../services/recorder/recorder_fetch";
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
@@ -13,6 +15,8 @@ export default function Recorder_Main() {
   ChartJS.register(ArcElement, Tooltip);
 
   const [pet, setPet] = useState([]);
+  const [address, setAddress] = useState([])
+  const [ownerData, setOwnerData] = useState([])
   const [unregister, setUnregister] = useState([]);
 
   const { baseUrl, alertSW, alertQuestion, user } = useAuth();
@@ -21,6 +25,12 @@ export default function Recorder_Main() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (ownerData.length > 0) {
+      fetchPetData();
+    }
+  }, [ownerData]);
+
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("DogAndCattoken");
@@ -28,11 +38,29 @@ export default function Recorder_Main() {
         return;
       }
 
-      const petData = await fetchAllPet(baseUrl, token);
-      setPet(petData);
+      const addressData = await fetchAddress(baseUrl, token);
+      setAddress(addressData);
 
-      const unregisterData = await fetchAllUnregisterPet(baseUrl, token);
+      const petOwnerData = await fetchPetOwner(baseUrl, token, addressData);
+      setOwnerData(petOwnerData);
+
+      const unregisterData = await fetchUnregister(baseUrl, token);
       setUnregister(unregisterData);
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchPetData = async () => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+
+      const petData = await fetchPet(baseUrl, token, ownerData);
+      setPet(petData);
     } catch (err) {
       console.log(err);
     }
