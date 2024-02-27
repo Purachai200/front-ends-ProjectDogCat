@@ -82,6 +82,8 @@ export default function AppRouter() {
   }
   
   return (
-    <RouterProvider router = {router} />
+    <RouterProvider router={router}>
+    <NotFound />
+  </RouterProvider>
   )
 }
