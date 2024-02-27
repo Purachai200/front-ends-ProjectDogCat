@@ -169,3 +169,18 @@ export const fetchSubAddress = async (baseUrl, token, user) => {
     return [];
   }
 };
+
+export const fetchUnregister = async (baseUrl, token) => {
+  try {
+    const result = await axios.get(
+      `${baseUrl}/recorder/getByData/table/unregistered/from/subdistrictId/`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return result.data;
+  } catch (err) {
+    console.log(err)
+    return[]
+  }
+}

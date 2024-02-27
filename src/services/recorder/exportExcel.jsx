@@ -9,22 +9,54 @@ import {
   fetchPet,
   fetchPetOwner,
   fetchSubAddress,
+  fetchUnregister
 } from "./recorder_fetch";
 
 const ExcelData = [
   {
-    "ชื่อ-นามสกุล": "",
-    หมายเลขบัตรประชาชน: "",
-    เบอร์โทรศัพท์: "",
-    บ้านเลขที่: "",
-    หมู่ที่: "",
-    ตำบล: "",
-    อำเภอ: "",
-    จังหวัด: "",
-    ซอย: "",
-    ถนน: "",
+    "ข้อมูลเจ้าของสัตว์เลี้ยง": {
+      "ชื่อ-สกุล": "",
+      "หมายเลขบัตรประชาชน": "",
+      "เบอร์โทรศัพท์": "",
+      "ที่อยู่": {
+        "หมู่": "",
+        "ตำบล": "",
+        "อำเภอ": "",
+        "จังหวัด": "",
+        "ซอย": "",
+        "ถนน": ""
+      }
+    }
   },
+  {
+    "ข้อมูลสัตว์เลี้ยง": {
+      "ประเภทสัตว์เลี้ยง": "",
+      "ชื่อสัตว์เลี้ยง": "",
+      "เพศ": "",
+      "สี": "",
+      "ประวัติการฉีดวัคซีน": "",
+      "วัคซีนครั้งล่าสุดประมาณ": "",
+      "การทำหมัน": "",
+      "อายุ": "",
+      "ลักษณะการเลี้ยง": "",
+      "สถานที่เลี้ยง": ""
+    }
+  }
 ];
+
+const ExcelUnreg = {
+  "แขวง / ตำบล" : "",
+  "หมู่ที่" : "",
+  "สถานที่อยู่อาศัย" : "",
+  "ชื่อสถานที่อยู่อาศัย" : "",
+  "ผู้ให้ข้อมูล" : "",
+  "สุนัข (จำนวน)": "",
+  "แมว (จำนวน)": "",
+  "ประวัติการฉีควัคชีน": "",
+  "การทำหมัน" : ""
+}
+
+
 
 const ExportExcel = ({ fileName }) => {
   const { baseUrl, user } = useAuth();
@@ -33,21 +65,32 @@ const ExportExcel = ({ fileName }) => {
   const [subdistrict, setSubdistrict] = useState([]);
   const [ownerData, setOwnerData] = useState([]);
   const [pet, setPet] = useState([]);
+
   const [location, setLocation] = useState([]);
   const [nature, setNature] = useState([]);
 
   const [isExporting, setIsExporting] = useState(false);
 
+  const [excelUnreg, setExcelUnreg] = useState(ExcelUnreg)
   const [excelData, setExcelData] = useState(ExcelData);
 
   useEffect(() => {
     fetchData();
-    setIsExporting(true);
+    setIsExporting(true)
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsExporting(false);
+    }, 10000);
+  
+    return () => clearTimeout(timer);
+  }, []);  
 
   useEffect(() => {
     if (ownerData.length > 0) {
       fetchPetData();
+      fetchUnregistered();
     }
   }, [ownerData]);
 
@@ -58,14 +101,15 @@ const ExportExcel = ({ fileName }) => {
         return;
       }
 
+      const subdistrictAddress = await fetchSubAddress(baseUrl, token, user);
+      setSubdistrict(subdistrictAddress);
+
       const addressData = await fetchAddress(baseUrl, token);
       setAddress(addressData);
 
       const petOwnerData = await fetchPetOwner(baseUrl, token, addressData);
       setOwnerData(petOwnerData);
-
-      const subdistrictAddress = await fetchSubAddress(baseUrl, token, user);
-      setSubdistrict(subdistrictAddress);
+      
     } catch (err) {
       console.log(err);
     }
@@ -77,17 +121,17 @@ const ExportExcel = ({ fileName }) => {
       if (!token) {
         return;
       }
-
       const addressData = await fetchAddress(baseUrl, token);
       const petOwnerData = await fetchPetOwner(baseUrl, token, addressData);
       const petData = await fetchPet(baseUrl, token, petOwnerData);
 
-      const locationData = await fetchLocation(baseUrl, token); // เรียกใช้ฟังก์ชันเพื่อดึงข้อมูล location
-      const natureData = await fetchNature(baseUrl, token); // เรียกใช้ฟังก์ชันเพื่อดึงข้อมูล nature
+      const locationData = await fetchLocation(baseUrl, token); 
+      const natureData = await fetchNature(baseUrl, token); 
 
       const locationMap = new Map(
         locationData.map((location) => [location.id, location])
       );
+
       const natureMap = new Map(
         natureData.map((nature) => [nature.id, nature])
       );
@@ -109,8 +153,9 @@ const ExportExcel = ({ fileName }) => {
 
         const excelData = petData.map((pet) => {
           const petOwner = petOwnerMap.get(pet.petOwnerId);
-          console.log(subdistrict);
-          // console.log(petOwner);
+          const location = locationMap.get(pet.locationId);
+          const nature = natureMap.get(pet.natureId)
+
           if (petOwner && petOwner.addressId) {
             const address = addressMap.get(petOwner.addressId);
             if (address) {
@@ -148,8 +193,8 @@ const ExportExcel = ({ fileName }) => {
                     : "ยังไม่ทำหมัน"
                 }`,
                 อายุ: `${pet.age} ปี`,
-                ลักษณะการเลี้ยง: pet.natureId,
-                สถานที่เลี้ยง: pet.locationId,
+                ลักษณะการเลี้ยง: nature.name_nature,
+                สถานที่เลี้ยง: location.name_location,
               };
             } else {
               return null;
@@ -160,7 +205,7 @@ const ExportExcel = ({ fileName }) => {
         });
 
         setExcelData(excelData.filter((data) => data !== null));
-        console.log(excelData);
+        // console.log(excelData);
       } else {
         console.log("No pet data found.");
       }
@@ -169,26 +214,74 @@ const ExportExcel = ({ fileName }) => {
     }
   };
 
-  // ตั้งเวลาหยุดนับถอยหลัง
-  setTimeout(() => {
-    setIsExporting(false);
-  }, 10000);
+  const fetchUnregistered = async () => {
+    try {
+      const token = localStorage.getItem("DogAndCattoken");
+      if (!token) {
+        return;
+      }
+  
+      const locationData = await fetchLocation(baseUrl, token); 
+      const petData = await fetchUnregister(baseUrl, token);
+  
+      const locationMap = new Map(
+        locationData.map((location) => [location.id, location])
+      );
+
+      if (petData && petData.length > 0) {
+        const excelData = petData.map((pet) => {
+          const location = locationMap.get(pet.locationId);
+          return {
+            "แขวง / ตำบล" : subdistrict && subdistrict.length > 0
+            ? subdistrict[0].sub_district || ""
+            : "",
+            "หมู่ที่" : pet.address_moo,
+            "สถานที่อยู่อาศัย" : location ? location.location : "",
+            "ชื่อสถานที่อยู่อาศัย" : location ? location.name_location : "",
+            "ผู้ให้ข้อมูล" : pet.name_info,
+            "สุนัข (จำนวน)": pet.dog_amount,
+            "แมว (จำนวน)": pet.cat_amount,
+            "ประวัติการฉีควัคชีน": `${
+              pet.vaccined === "VACCINED" ? "เคยฉีด" : "ไม่เคยฉีด"
+            }`,
+            "การทำหมัน" : `${
+              pet.sterilize === "STERILIZED"
+                ? "ทำหมันแล้ว"
+                : "ยังไม่ทำหมัน"
+            }`
+          };
+        });
+  
+        setExcelUnreg(excelData.filter((data) => data !== null));
+      } else {
+        console.log("No pet data found.");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }  
 
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
 
   const exportToExcel = () => {
+    const wb = XLSX.utils.book_new();
+  
     const ws = XLSX.utils.json_to_sheet(excelData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+    XLSX.utils.book_append_sheet(wb, ws, "สัตว์มีเจ้าของ");
+  
+    const ws2 = XLSX.utils.json_to_sheet(excelUnreg);
+    XLSX.utils.book_append_sheet(wb, ws2, "สัตว์ไม่มีเจ้าของ");
+  
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const data = new Blob([excelBuffer], { type: fileType });
     FileSaver.saveAs(data, fileName + fileExtension);
-  };
+  };  
 
   return (
     <div
-      className={`btn btn-outline border-green-400 text-green-400 ${isExporting ? "disabled" : ""}`}
+      className={`btn btn-outline hover:border-green-400 text-green-400 ${isExporting ? "disabled" : ""}`}
       onClick={exportToExcel}
       disabled={isExporting}
     >

@@ -98,7 +98,7 @@ export default function RecorderSidebar() {
             <Link to={"/rec-nature"}>เพิ่มลักษณะการเลี้ยง</Link>
           </li>
           <li className="text-l">
-          <ExportExcel fileName={"Excel Export"}/>
+          <ExportExcel fileName={"ฟอร์มข้อมูล"}/>
           </li>
           <div className="btn btn-outline btn-error mt-auto" onClick={Logout}>
             ออกจากระบบ
