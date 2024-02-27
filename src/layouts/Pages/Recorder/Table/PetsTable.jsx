@@ -234,6 +234,7 @@ export default function PetsTable(owner_id) {
                   <option value="" disabled>
                     กรุณาเลือกปีที่ฉีดวัคซีน
                   </option>
+                  <option value="0000">ไม่ระบุ</option>
                     <option value="2561">ปี 2561</option>
                     <option value="2562">ปี 2562</option>
                     <option value="2563">ปี 2563</option>

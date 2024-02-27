@@ -92,6 +92,29 @@ const alertQuestion = (title, text, func) => {
   });
 };
 
+const questionAlert = (title, text, func, title2, text2) => {
+  Swal.fire({
+    title: title,
+    text: text,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "ตกลง",
+    cancelButtonText: "ยกเลิก"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: title2,
+        text: text2,
+        icon: "success"
+      }).then(() => {
+        func();
+      });
+    }
+  });
+};
+
 const alertSW = (title,text,icon) => {
   Swal.fire({
     title: title,
@@ -102,7 +125,7 @@ const alertSW = (title,text,icon) => {
 }
 
 return (
-  <AuthContext.Provider value={{ user, setUser, loading, logout, baseUrl, swalLoading, alertSW, alertQuestion }}>
+  <AuthContext.Provider value={{ user, setUser, loading, logout, baseUrl, swalLoading, alertSW, alertQuestion, questionAlert }}>
     {props.children}
   </AuthContext.Provider>
   )
