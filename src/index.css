@@ -94,6 +94,9 @@
     max-width: 400px;
   }
   .table-native {
-    max-height: 380px;
+    max-height: 350px;
+  }
+  .short-table-native {
+    max-height: 300px;
   }
 }

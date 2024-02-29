@@ -932,7 +932,7 @@ export default function Register_Table() {
           <FontAwesomeIcon icon={"plus"}/>
         </div>
       </div>
-      <div className="overflow-x-auto overflow-y-scroll max-h-[450px] w-full p-2 table-native">
+      <div className="overflow-x-auto overflow-y-scroll max-h-[450px] w-full p-2 table-native short-table-native">
         {selectedMoo.length === 0 ? (
           <table className="table">
             {/* head */}

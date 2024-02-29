@@ -106,7 +106,7 @@ export default function RecorderSidebar() {
         </ul>
       </div>
       <div className="bottom-nav">
-        <div className="btm-nav">
+        <div className="btm-nav bg-base-300">
           <Link to={"/"}>
             <FontAwesomeIcon className="text-xl hover:text-green-400 transition-all" icon={"home-alt"}/>
           </Link>
